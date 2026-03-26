@@ -1,0 +1,37 @@
+{
+  "name": "custom-push",
+  "version": "1.0.0",
+  "description": "Backend scaffolding for Firebase push notifications with optional frontend support",
+  "bin": {
+    "custom-push": "./bin/cli.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "bin",
+    "dist",
+    "lib/templates"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^5.0.0",
+    "chalk": "^5.0.0",
+    "semver": "^7.6.0",
+    "commander": "^11.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0",
+    "@types/semver": "^7.5.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
