@@ -1,7 +1,7 @@
 {
   "name": "custom-push",
   "version": "1.0.0",
-  "description": "Backend scaffolding for Firebase push notifications with optional frontend support",
+  "description": "CustomPush - Firebase push notifications setup tool",
   "bin": {
     "custom-push": "./bin/cli.js"
   },
@@ -21,7 +21,9 @@
     "@inquirer/prompts": "^5.0.0",
     "chalk": "^5.0.0",
     "semver": "^7.6.0",
-    "commander": "^11.0.0"
+    "commander": "^11.0.0",
+    "cli-spinners": "^2.9.2",
+    "ora": "^7.0.1"
   },
   "devDependencies": {
     "typescript": "^5.0.0",
@@ -33,5 +35,16 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "keywords": [
+    "firebase",
+    "push-notifications",
+    "react",
+    "fcm",
+    "web-push",
+    "cli",
+    "custompush"
+  ],
+  "author": "CustomPush Team",
+  "license": "MIT"
 }

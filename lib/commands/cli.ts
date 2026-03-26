@@ -1,11 +1,11 @@
 import { program } from 'commander'
 import { init } from './init'
 import { generateServiceWorker } from './generateServiceWorker'
-import { logger } from '../utils/logger'
+import { header, footer, showError, showWarning } from '../utils/branding'
 
 program
   .name('custom-push')
-  .description('CLI for Firebase push notifications - Backend scaffolding with optional frontend support')
+  .description('CustomPush - Firebase push notifications setup tool')
   .version('1.0.0')
 
 // Main init command - backend focused by default
@@ -15,23 +15,19 @@ program
   .option('--generate-frontend', 'Generate frontend boilerplate files')
   .option('--backend-only', 'Skip frontend completely, backend only')
   .action(async (options) => {
+    header('CustomPush', 'Firebase Push Notifications Setup Tool')
+    
     try {
       await init(options)
+      footer('CustomPush setup completed successfully')
     } catch (error: any) {
       if (error.name === 'ExitPromptError' || error.message?.includes('User force closed')) {
-        logger.blank()
-        logger.warn('👋 Setup cancelled by user')
-        logger.info('   No worries! You can run the command again anytime.')
-        logger.info('   Just type: npx custom-push init')
-        logger.blank()
+        showWarning('Setup Cancelled', 'Setup was cancelled by user')
+        footer('Run again anytime with: npx custom-push init')
         process.exit(0)
       } else {
-        logger.blank()
-        logger.error('❌ Something went wrong during setup')
-        logger.error(`   ${error.message || error}`)
-        logger.info('   💡 Need help? Check the troubleshooting guide:')
-        logger.info('   https://github.com/your-username/custom-push/blob/main/docs/TROUBLESHOOTING.md')
-        logger.blank()
+        showError('Setup Failed', error.message || 'Unknown error occurred', 'Check troubleshooting guide for help')
+        footer('Need help? https://github.com/your-username/custom-push/issues')
         process.exit(1)
       }
     }
@@ -43,22 +39,19 @@ program
   .alias('generate-sw')
   .description('Generate only the service worker file')
   .action(async () => {
+    header('CustomPush Service Worker Generator')
+    
     try {
       await generateServiceWorker()
+      footer('Service worker generated successfully')
     } catch (error: any) {
       if (error.name === 'ExitPromptError' || error.message?.includes('User force closed')) {
-        logger.blank()
-        logger.warn('👋 Service worker generation cancelled')
-        logger.info('   No problem! Run it again when you\'re ready:')
-        logger.info('   npx custom-push generate-service-worker')
-        logger.blank()
+        showWarning('Generation Cancelled', 'Service worker generation was cancelled')
+        footer('Run again anytime with: npx custom-push generate-service-worker')
         process.exit(0)
       } else {
-        logger.blank()
-        logger.error('❌ Failed to generate service worker')
-        logger.error(`   ${error.message || error}`)
-        logger.info('   💡 Make sure you have Firebase configuration ready')
-        logger.blank()
+        showError('Generation Failed', error.message || 'Failed to generate service worker', 'Ensure Firebase configuration is ready')
+        footer('Check Firebase Console for correct configuration')
         process.exit(1)
       }
     }
@@ -66,12 +59,8 @@ program
 
 // Handle uncaught promise rejections
 process.on('unhandledRejection', (reason, promise) => {
-  logger.blank()
-  logger.error('❌ Unexpected error occurred')
-  logger.error(`   ${reason instanceof Error ? reason.message : String(reason)}`)
-  logger.info('   This shouldn\'t happen. Please report this issue:')
-  logger.info('   https://github.com/your-username/custom-push/issues')
-  logger.blank()
+  showError('Unexpected Error', reason instanceof Error ? reason.message : String(reason), 'Please report this issue to help us improve')
+  footer('Report: https://github.com/your-username/custom-push/issues')
   process.exit(1)
 })
 

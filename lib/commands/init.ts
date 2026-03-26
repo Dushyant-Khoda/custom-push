@@ -1,6 +1,5 @@
 import { confirm } from '@inquirer/prompts'
 import { CLIContext } from '../types'
-import { logger } from '../utils/logger'
 import { createSpinner } from '../utils/spinner'
 import { printSummary } from '../utils/printSummary'
 import { detectProject } from '../core/detectProject'
@@ -10,66 +9,55 @@ import { runPrompts } from '../modules/runPrompts'
 import { generateConfig } from '../modules/generateConfig'
 import { scaffoldFrontend } from '../modules/scaffoldFrontend'
 import { scaffoldBackend } from '../modules/scaffoldBackend'
+import { showStep, messages, successAnimation } from '../utils/branding'
 
 export async function init(options: { generateFrontend?: boolean; backendOnly?: boolean } = {}): Promise<void> {
   const cwd = process.cwd()
   const { generateFrontend = false, backendOnly = false } = options
 
-  logger.blank()
-  logger.divider()
-  logger.info('custom-push init')
-  if (backendOnly) logger.info('(backend-only mode)')
-  if (generateFrontend) logger.info('(with frontend generation)')
-  logger.divider()
-  logger.blank()
+  // Show welcome message
+  console.log(messages.welcome)
 
   // ── Step 1: Detect project ────────────────────────────────────────────
-  const detectSpin = createSpinner('Detecting project...')
+  showStep(1, 'Analyzing project structure...')
+  const detectSpin = createSpinner('Detecting project configuration...', 'dots')
   detectSpin.start()
   const project = await detectProject(cwd)
-  detectSpin.stop()
+  detectSpin.succeed('Project detected successfully')
   
-  logger.success(`Language: ${project.language}`)
-  logger.success(`React: ${project.reactVersion || 'not found'}`)
-  logger.success(`Firebase: ${project.firebaseVersion || 'not installed'}`)
-  if (project.backendFramework) {
-    logger.success(`Backend: ${project.backendFramework}`)
-  }
-  logger.success(`Scope: ${project.scope}`)
+  console.log(`   ${messages.success.detected}`)
+  console.log(`   Language: ${project.language}`)
+  console.log(`   React: ${project.reactVersion ? '✓' : '✗'}`)
+  console.log(`   Firebase: ${project.hasFirebase ? '✓' : '✗'}`)
+  console.log(`   Scope: ${project.scope}`)
 
-  // ── Step 2: Validate versions ─────────────────────────────────────────
-  logger.blank()
-  const valSpin = createSpinner('Checking version compatibility...')
-  valSpin.start()
-  const warnings = validateVersions(project)
-  valSpin.stop(warnings.length === 0)
+  // ── Step 2: Validate versions ───────────────────────────────────────────
+  showStep(2, 'Validating dependencies...')
+  const validateSpin = createSpinner('Checking version compatibility...', 'pulse')
+  validateSpin.start()
+  const warnings = await validateVersions(project)
+  validateSpin.succeed('Version validation complete')
 
   if (warnings.length > 0) {
-    for (const w of warnings) {
-      logger.warn(`${w.package} version mismatch`)
-      logger.info(`   Found:    ${w.found}`)
-      logger.info(`   Required: ${w.required}`)
-      logger.info(`   Fix:      ${w.fix}`)
-    }
-    logger.blank()
-
-    const shouldContinue = await confirm({
-      message: 'Versions above may cause issues. Continue anyway?',
-      default: false,
+    console.log()
+    console.log(messages.warning.incompatible)
+    warnings.forEach(warning => {
+      console.log(`   ${warning}`)
     })
-
-    if (!shouldContinue) {
-      logger.blank()
-      logger.info('Fix the above and re-run: npx custom-push init')
+    
+    const answers = await runPrompts(project, { backendOnly })
+    if (!answers) {
+      console.log()
+      console.log(messages.error.cancelled)
       process.exit(0)
     }
-
-    logger.warn('Proceeding with incompatible versions. Things may break.')
+    
+    console.log()
+    console.log(messages.warning.proceeding)
   }
 
   // ── Step 3: Run prompts ───────────────────────────────────────────────
-  logger.blank()
-  logger.step(3, 'Configuring push notifications...')
+  showStep(3, 'Configuring push notifications...')
   const answers = await runPrompts(project, { backendOnly })
 
   // ── Build context ─────────────────────────────────────────────────────
@@ -77,44 +65,46 @@ export async function init(options: { generateFrontend?: boolean; backendOnly?: 
 
   // ── Step 4: Process credentials ───────────────────────────────────────
   if (answers.credentialsPath) {
-    logger.blank()
-    const credSpin = createSpinner('Processing credentials.json...')
+    showStep(4, 'Processing Firebase credentials...')
+    const credSpin = createSpinner('Validating credentials.json...', 'arrow')
     credSpin.start()
     const resolvedPath = await readCredentials(answers.credentialsPath, project)
     answers.backendUrls.credentialsPath = resolvedPath
-    credSpin.stop()
+    credSpin.succeed('Firebase credentials processed')
   }
 
   // ── Step 5: Write our_pkg.json ────────────────────────────────────────
-  logger.blank()
-  const configSpin = createSpinner('Writing our_pkg.json...')
+  showStep(5, 'Creating configuration file...')
+  const configSpin = createSpinner('Generating our_pkg.json...', 'star')
   configSpin.start()
   await generateConfig(context)
-  configSpin.stop()
+  configSpin.succeed('Configuration file created')
 
   // ── Step 6: Scaffold frontend (optional) ────────────────────────────────
   if (generateFrontend && !backendOnly) {
-    logger.blank()
-    const frontSpin = createSpinner('Scaffolding frontend files...')
+    showStep(6, 'Building frontend components...')
+    const frontSpin = createSpinner('Generating frontend boilerplate...', 'rocket')
     frontSpin.start()
     context.scaffolded.push(...(await scaffoldFrontend(context)))
-    frontSpin.stop()
+    frontSpin.succeed('Frontend scaffolding complete')
   } else if (!backendOnly) {
-    logger.blank()
-    logger.info('📦 Frontend will be handled by custom-push package')
-    logger.info('   Install with: npm install custom-push')
-    logger.info('   Usage: import { usePush } from "custom-push"')
+    console.log()
+    console.log(messages.next.install)
+    console.log(messages.next.import)
+    console.log(messages.next.wrap)
+    console.log(messages.next.test)
   }
 
   // ── Step 7: Scaffold backend ──────────────────────────────────────────
   if (project.scope === 'both') {
-    logger.blank()
-    const backSpin = createSpinner('Scaffolding backend files...')
+    showStep(7, 'Building backend infrastructure...')
+    const backSpin = createSpinner('Generating backend helpers...', 'line')
     backSpin.start()
     context.scaffolded.push(...(await scaffoldBackend(context)))
-    backSpin.stop()
+    backSpin.succeed('Backend scaffolding complete')
   }
 
-  // ── Print summary ─────────────────────────────────────────────────────
-  await printSummary(context)
+  // ── Final summary ─────────────────────────────────────────────────────
+  successAnimation('CustomPush setup completed successfully!')
+  printSummary(context)
 }

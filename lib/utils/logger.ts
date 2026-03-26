@@ -1,35 +1,61 @@
 import chalk from 'chalk'
+import { brand, colors } from './branding'
+
+// Re-export brand functions for backward compatibility
+export const { 
+  logo, accent, success, warning, error, info, muted, subtle, highlight, code 
+} = brand
 
 export const logger = {
-  info(message: string): void {
-    console.log(chalk.blue(`  ℹ  ${message}`))
+  blank: () => console.log(),
+  
+  divider: (char: string = '─', width: number = 50) => {
+    console.log(chalk.hex(colors.dark)(char.repeat(width)))
   },
 
-  success(message: string): void {
-    console.log(chalk.green(`  ✓  ${message}`))
+  info: (message: string) => {
+    console.log(chalk.hex(colors.info)(message))
   },
 
-  warn(message: string): void {
-    console.log(chalk.yellow(`  ⚠  ${message}`))
+  success: (message: string) => {
+    console.log(chalk.hex(colors.success)(message))
   },
 
-  error(message: string): void {
-    console.log(chalk.red(`  ✖  ${message}`))
+  warn: (message: string) => {
+    console.log(chalk.hex(colors.warning)(message))
   },
 
-  step(n: number, label: string): void {
-    console.log(chalk.white(`  [${n}] ${label}`))
+  error: (message: string) => {
+    console.log(chalk.hex(colors.error)(message))
   },
 
-  divider(): void {
-    console.log('  ──────────────────────────────────────────────')
+  step: (step: number, title: string) => {
+    const progress = chalk.bgHex(colors.primary).hex(colors.light)(`Step ${step}`)
+    console.log(`\n${progress} ${chalk.hex(colors.info)(title)}`)
   },
 
-  blank(): void {
-    console.log('')
-  },
-
-  raw(message: string): void {
+  raw: (message: string) => {
     console.log(message)
   },
+
+  // Brand-specific methods
+  logo: (message: string) => {
+    console.log(brand.logo(message))
+  },
+
+  accent: (message: string) => {
+    console.log(brand.accent(message))
+  },
+
+  muted: (message: string) => {
+    console.log(brand.muted(message))
+  },
+
+  highlight: (message: string) => {
+    console.log(brand.highlight(message))
+  },
+
+  code: (message: string) => {
+    console.log(brand.code(message))
+  }
 }
