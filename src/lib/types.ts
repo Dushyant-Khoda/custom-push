@@ -14,6 +14,8 @@ export interface PushMessage {
   id: string
   title: string
   body: string
+  icon?: string
+  url?: string
   data?: Record<string, string>
   timestamp: number
 }

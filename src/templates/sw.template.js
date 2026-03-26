@@ -18,29 +18,53 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging()
 
+// Background message handler
 messaging.onBackgroundMessage(function(payload) {
-  const title   = payload.notification?.title || 'New notification'
-  const options = {
-    body:  payload.notification?.body || '',
-    icon:  payload.notification?.icon || '/icon.png',
+  console.log('[custom-push] Received background message:', payload)
+
+  const notificationTitle = payload.notification?.title || payload.data?.title || 'New Notification'
+  
+  // Extract URL from various possible fields
+  const notificationUrl = payload.data?.url || 
+                          payload.data?.route || 
+                          payload.fcmOptions?.link || 
+                          payload.notification?.click_action ||
+                          '/'
+
+  const notificationOptions = {
+    body: payload.notification?.body || payload.data?.body || '',
+    icon: payload.notification?.icon || payload.data?.icon || '/icon.png',
     badge: '/badge.png',
-    data:  payload.data || {}
+    data: {
+      ...payload.data,
+      url: notificationUrl // Ensure URL is stored in data for the click handler
+    }
   }
-  self.registration.showNotification(title, options)
+
+  return self.registration.showNotification(notificationTitle, notificationOptions)
 })
 
+// Notification click handler
 self.addEventListener('notificationclick', function(event) {
   event.notification.close()
-  const route = event.notification.data?.route || '/'
+
+  // Find the URL to open (check data.url then fallback to '/')
+  const urlToOpen = event.notification.data?.url || '/'
+
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
+      // 1. If a window is already open at the same origin, navigate and focus it
       for (const client of clientList) {
         if (client.url.includes(self.location.origin) && 'focus' in client) {
-          client.navigate(route)
+          // You could optionally check if the URL matches, but usually focus is better
+          client.navigate(urlToOpen)
           return client.focus()
         }
       }
-      if (clients.openWindow) return clients.openWindow(route)
+      // 2. Otherwise open a new window
+      if (clients.openWindow) {
+        return clients.openWindow(urlToOpen)
+      }
     })
   )
 })

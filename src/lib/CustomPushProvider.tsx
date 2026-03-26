@@ -80,6 +80,8 @@ export function CustomPushProvider({ config, children }: CustomPushProviderProps
             id: Date.now().toString(),
             title: payload.notification?.title ?? '',
             body: payload.notification?.body ?? '',
+            icon: payload.notification?.icon || payload.data?.icon,
+            url: payload.data?.url || payload.data?.route || (payload as any).fcmOptions?.link,
             data: payload.data as Record<string, string> | undefined,
             timestamp: Date.now(),
           },
