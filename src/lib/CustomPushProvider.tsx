@@ -72,7 +72,7 @@ export function CustomPushProvider({ config, children }: CustomPushProviderProps
             }).catch(() => { })
           }
         }
-
+        // Add Payload
         onMessage(messaging, (payload) => {
           setMessages(prev => [...prev, {
             id: Date.now().toString(),
