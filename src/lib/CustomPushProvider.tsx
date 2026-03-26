@@ -54,40 +54,41 @@ export function CustomPushProvider({ config, children }: CustomPushProviderProps
     if (!isSupported || initialized.current) return
     initialized.current = true
 
-    ;(async () => {
-      const granted = await requestPermission()
-      if (!granted) return
+      ; (async () => {
+        const granted = await requestPermission()
+        if (!granted) return
 
-      const app = getApps().length ? getApps()[0] : initializeApp(config)
-      const messaging = getMessaging(app)
+        const app = getApps().length ? getApps()[0] : initializeApp(config)
+        const messaging = getMessaging(app)
 
-      const fcmToken = await getPushToken(config)
-      if (fcmToken) {
-        setToken(fcmToken)
-        if (config.registerUrl) {
-          await fetch(config.registerUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token: fcmToken }),
-          }).catch(() => {})
+        const fcmToken = await getPushToken(config)
+        if (fcmToken) {
+          setToken(fcmToken)
+          if (config.registerUrl) {
+            await fetch(config.registerUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ token: fcmToken }),
+            }).catch(() => { })
+          }
         }
-      }
 
-      onMessage(messaging, (payload) => {
-        setMessages((prev) => [
-          ...prev,
-          {
+        onMessage(messaging, (payload) => {
+          setMessages(prev => [...prev, {
             id: Date.now().toString(),
             title: payload.notification?.title || payload.data?.title || '',
             body: payload.notification?.body || payload.data?.body || '',
             icon: payload.notification?.icon || payload.data?.icon,
-            url: payload.data?.url || payload.data?.route || (payload as any).fcmOptions?.link,
+            url: payload.data?.action_url
+              || payload.data?.url
+              || payload.data?.route
+              || payload.data?.click_action
+              || (payload as any).fcmOptions?.link,
             data: payload.data as Record<string, string> | undefined,
             timestamp: Date.now(),
-          },
-        ])
-      })
-    })()
+          }])
+        })
+      })()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
