@@ -12,7 +12,7 @@
 
 ## Zero-Config Integration (Recommended)
 
-The CLI automatically scaffolds a `src/push/notificationHandler/` directory designed for almost zero-effort integration.
+The CLI automatically scaffolds a `src/NotificationHandler/` directory designed for almost zero-effort integration.
 
 ### 1. Minimal App Wrap
 Simply wrap your application with the pre-configured provider and manager.
@@ -20,8 +20,8 @@ Simply wrap your application with the pre-configured provider and manager.
 ```tsx
 // layout.tsx or App.tsx
 import { CustomPushProvider } from 'custom-push';
-import { pushConfig } from './push/notificationHandler/pushConfig';
-import { PushNotificationManager } from './push/notificationHandler/PushNotificationManager';
+import { pushConfig } from './src/NotificationHandler/pushConfig';
+import { PushNotificationManager } from './src/NotificationHandler/PushNotificationManager';
 
 export default function RootLayout({ children }) {
   return (

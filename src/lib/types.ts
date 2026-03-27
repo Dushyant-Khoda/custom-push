@@ -8,6 +8,7 @@ export interface PushConfig {
   vapidKey: string
   registerUrl?: string       // POST endpoint to save token to backend
   unregisterUrl?: string     // POST endpoint to remove token from backend
+  serviceWorkerPath?: string // Custom path for firebase-messaging-sw.js
 }
 
 export interface PushMessage {

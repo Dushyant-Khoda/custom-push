@@ -26,12 +26,12 @@ npx custom-push init
 ```
 
 ### 2. Wrap your application (Recommended)
-The CLI automatically generates a `src/push/notificationHandler/` directory. Use it to wrap your app:
+The CLI automatically generates a `src/NotificationHandler/` directory. Use it to wrap your app:
 
 ```tsx
 import { CustomPushProvider } from 'custom-push';
-import { pushConfig } from './push/notificationHandler/pushConfig';
-import { PushNotificationManager } from './push/notificationHandler/PushNotificationManager';
+import { pushConfig } from './src/NotificationHandler/pushConfig';
+import { PushNotificationManager } from './src/NotificationHandler/PushNotificationManager';
 
 function RootLayout({ children }) {
   return (
@@ -45,7 +45,7 @@ function RootLayout({ children }) {
 ```
 
 ### 3. Add an "Enable Notifications" Button
-Check the generated `src/push/notificationHandler/USAGE.md` for a professional, copy-pasteable permission toggle button.
+Check the generated `src/NotificationHandler/USAGE.md` for a professional, copy-pasteable permission toggle button.
 
 ## Advanced Frontend Integration
 

@@ -102,14 +102,14 @@ export async function printSummary(context: CLIContext): Promise<void> {
 
     logger.raw(`  [2] Wrap your app root (src/App.tsx or src/main.tsx):`)
     logger.raw(`      import { CustomPushProvider } from 'custom-push'`)
-    logger.raw(`      import { pushConfig } from './push/NotificationHandler/config'`)
+    logger.raw(`      import { pushConfig } from './NotificationHandler/config'`)
     logger.blank()
     logger.raw(`      <CustomPushProvider config={pushConfig}>`)
     logger.raw(`        <YourApp />`)
     logger.raw(`      </CustomPushProvider>`)
     logger.blank()
     logger.raw(`  [3] Add a permission toggle button:`)
-    logger.raw(`      Check the USAGE.md in src/push/NotificationHandler/`)
+    logger.raw(`      Check the USAGE.md in src/NotificationHandler/`)
     logger.blank()
   }
 

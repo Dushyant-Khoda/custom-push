@@ -12,7 +12,8 @@ export async function getPushToken(config: PushConfig): Promise<string | null> {
       : initializeApp(config)
 
     const messaging = getMessaging(app)
-    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js')
+    const swPath = config.serviceWorkerPath || '/firebase-messaging-sw.js'
+    const registration = await navigator.serviceWorker.register(swPath)
     const token = await getToken(messaging, {
       vapidKey: config.vapidKey,
       serviceWorkerRegistration: registration,

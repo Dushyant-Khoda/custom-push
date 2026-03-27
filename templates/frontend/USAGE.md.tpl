@@ -10,7 +10,7 @@ In your `src/App.tsx` or `src/main.tsx`:
 
 ```tsx
 import { CustomPushProvider } from 'custom-push'
-import { pushConfig } from './push/NotificationHandler/config'
+import { pushConfig } from './NotificationHandler/config'
 
 function App() {
   return (
@@ -49,11 +49,11 @@ If you need the FCM token directly:
 
 ```tsx
 import { getPushToken } from 'custom-push'
-import { pushConfig } from './push/NotificationHandler/config'
+import { pushConfig } from './NotificationHandler/config'
 
 const token = await getPushToken(pushConfig)
 console.log('FCM Token:', token)
 ```
 
 ### 5. Custom notification handling
-Open `src/push/NotificationHandler/PushNotificationManager.tsx` to customize how notifications are displayed when the app is in the foreground.
+Open `src/NotificationHandler/PushNotificationManager.tsx` to customize how notifications are displayed when the app is in the foreground.

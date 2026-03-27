@@ -58,9 +58,7 @@ export async function scaffoldFrontend(context: CLIContext): Promise<ScaffoldedF
   const helperContent = await readFile(helperTemplatePath)
 
   // ── Ensure directories exist ──────────────────────────────────────────
-  const pushDir = path.join(project.srcDir, 'push')
-  const handlerDir = path.join(pushDir, 'NotificationHandler')
-  await ensureDir(pushDir)
+  const handlerDir = path.join(project.srcDir, 'NotificationHandler')
   await ensureDir(handlerDir)
 
   const helperPath = path.join(handlerDir, `pushHelper.${ext}`)

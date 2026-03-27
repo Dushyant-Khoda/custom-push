@@ -135,7 +135,7 @@ When a file collision occurs (e.g., `FCMHelper.js` already exists), the CLI offe
 your-project/
 ├── node_modules/custom-push/       # Runtime logic
 ├── public/firebase-messaging-sw.js # Service worker
-└── src/push/notificationHandler/   # Zero-Config Setup
+└── src/NotificationHandler/   # Zero-Config Setup
     ├── pushConfig.ts               # Auto-syncing configuration
     ├── PushNotificationManager.tsx  # Global logic component
     └── USAGE.md                    # Localized integration guide

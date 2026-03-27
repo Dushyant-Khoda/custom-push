@@ -165,7 +165,7 @@ const {
 
 ### Zero-Config Scaffolding (Recommended)`
 
-The CLI provides a pre-architected integration at `src/push/notificationHandler/`.
+The CLI provides a pre-architected integration at `src/NotificationHandler/`.
 
 #### PushNotificationManager.tsx`
 A Client Component that monitors `usePushMessage` to handle:
