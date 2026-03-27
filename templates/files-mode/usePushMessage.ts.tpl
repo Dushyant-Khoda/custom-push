@@ -7,7 +7,7 @@ import { PushContext, PushContextValue } from './pushProvider'
 
 /**
  * Hook to access push notification state and methods.
- * Must be used inside <PushProvider>.
+ * Must be used inside <CustomPushProvider>.
  *
  * Usage:
  *   const { token, messages, requestPermission, browserSupport } = usePushMessage()
@@ -20,8 +20,8 @@ export function usePushMessage(): PushContextValue {
   const ctx = useContext(PushContext)
   if (!ctx) {
     throw new Error(
-      'usePushMessage must be used inside <PushProvider>. ' +
-      'Wrap your app with <PushProvider> in your root component.'
+      'usePushMessage must be used inside <CustomPushProvider>. ' +
+      'Wrap your app with <CustomPushProvider> in your root component.'
     )
   }
   return ctx

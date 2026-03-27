@@ -152,7 +152,7 @@ interface PushContextType {
 
 const PushContext = createContext<PushContextType | null>(null)
 
-export function PushProvider({ children }: { children: React.ReactNode }) {
+export function CustomPushProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null)
   const [isReady, setIsReady] = useState(false)
   const [lastMessage, setLastMessage] = useState(null)
@@ -177,19 +177,19 @@ export function PushProvider({ children }: { children: React.ReactNode }) {
 export function usePushContext() {
   const context = useContext(PushContext)
   if (!context) {
-    throw new Error('usePushContext must be used within PushProvider')
+    throw new Error('usePushContext must be used within CustomPushProvider')
   }
   return context
 }
 
 // App.tsx
-import { PushProvider } from './context/PushContext'
+import { CustomPushProvider } from './context/PushContext'
 
 function App() {
   return (
-    <PushProvider>
+    <CustomPushProvider>
       <YourApp />
-    </PushProvider>
+    </CustomPushProvider>
   )
 }
 ```
@@ -270,6 +270,48 @@ return (
     ))}
   </ul>
 );
+```
+
+### Next.js App Router Integration
+In Next.js App Router, context providers must be Client Components. We recommend creating a separate client wrapper.
+
+#### 1. Create a Client Wrapper
+```typescript
+// components/PushProviderWrapper.tsx
+'use client';
+
+import { CustomPushProvider } from 'custom-push';
+
+export function PushProviderWrapper({ children }: { children: React.ReactNode }) {
+  const pushConfig = {
+    apiKey: "...",
+    // ... rest of your config
+  };
+
+  return (
+    <CustomPushProvider config={pushConfig}>
+      {children}
+    </CustomPushProvider>
+  );
+}
+```
+
+#### 2. Wrap your Root Layout
+```typescript
+// app/layout.tsx
+import { PushProviderWrapper } from '../components/PushProviderWrapper';
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <PushProviderWrapper>
+          {children}
+        </PushProviderWrapper>
+      </body>
+    </html>
+  );
+}
 ```
 
 ## Premium Backend FCM Engine

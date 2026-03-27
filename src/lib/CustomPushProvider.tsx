@@ -1,3 +1,5 @@
+'use client'
+
 import React, { createContext, useState, useCallback, useRef, useEffect } from 'react'
 import { initializeApp, getApps } from 'firebase/app'
 import { getMessaging, onMessage, Unsubscribe } from 'firebase/messaging'

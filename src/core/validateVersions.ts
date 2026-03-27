@@ -9,9 +9,10 @@ export function validateVersions(project: ProjectInfo, options: { backendOnly?: 
   // ── Frontend Checks (Skip if backend-only) ────────────────────────────
   if (!backendOnly) {
     // ── Firebase check ─────────────────────────────────────────────────────
+    const isFrontendScope = project.scope === 'frontend' || project.scope === 'both'
     if (!project.firebaseVersion) {
-      // Only warn if we expect a frontend
-      if (project.scope === 'frontend' || project.scope === 'both') {
+      // Prompt for missing firebase if it's a frontend project
+      if (isFrontendScope) {
         warnings.push({
           package: 'firebase',
           found: 'not installed',

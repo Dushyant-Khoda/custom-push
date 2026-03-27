@@ -6,15 +6,15 @@
 
 ## Quick Start
 
-### 1. Wrap your app with `PushProvider`
+### 1. Wrap your app with `CustomPushProvider`
 
 ```tsx
 // App.tsx or main.tsx
-import { PushProvider } from './push-notification/pushProvider'
+import { CustomPushProvider } from './push-notification/pushProvider'
 
 function App() {
   return (
-    <PushProvider
+    <CustomPushProvider
       onToast={(msg) => {
         // Show in-app toast when tab is active
         // Plug in your toast library here (react-hot-toast, sonner, etc.)
@@ -22,7 +22,7 @@ function App() {
       }}
     >
       <YourApp />
-    </PushProvider>
+    </CustomPushProvider>
   )
 }
 ```

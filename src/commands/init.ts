@@ -111,7 +111,7 @@ export async function init(options: {
   if (mode === 'files' && !backendOnly) {
     // --files mode: generate standalone files into src/push-notification/
     showStep(6, 'Generating standalone push notification files...')
-    const filesSpin = createSpinner('Scaffolding push-notification files...', 'rocket')
+    const filesSpin = createSpinner('Scaffolding push-notification files...', 'dots')
     filesSpin.start()
     context.scaffolded.push(...(await scaffoldFiles(context)))
     filesSpin.succeed('Standalone files generated')
@@ -119,14 +119,14 @@ export async function init(options: {
     // Library mode: scaffold frontend boilerplate
     if (generateFrontend) {
       showStep(6, 'Building frontend components...')
-      const frontSpin = createSpinner('Generating frontend boilerplate...', 'rocket')
+      const frontSpin = createSpinner('Generating frontend boilerplate...', 'dots')
       frontSpin.start()
       context.scaffolded.push(...(await scaffoldFrontend(context)))
       frontSpin.succeed('Frontend scaffolding complete')
     } else {
       // Default library mode — generate service worker + show import instructions
       showStep(6, 'Generating service worker...')
-      const swSpin = createSpinner('Creating service worker file...', 'rocket')
+      const swSpin = createSpinner('Creating service worker file...', 'dots')
       swSpin.start()
       context.scaffolded.push(...(await scaffoldFrontend(context)))
       swSpin.succeed('Service worker generated')

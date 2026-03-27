@@ -7,7 +7,7 @@ Building a production-grade CLI tool (`npx custom-push init`) that sets up Fireb
 
 ##  CURRENT STATE ANALYSIS
 
-### ✅ ALREADY IMPLEMENTED (Following structure.md)
+###  ALREADY IMPLEMENTED (Following structure.md)
 - **Package Configuration**: Dependencies correctly set up (@inquirer/prompts, chalk, semver)
 - **TypeScript Types**: All interfaces defined in `lib/types.ts` 
 - **Logger Utility**: Complete colored terminal output in `lib/utils/logger.ts`
@@ -19,20 +19,20 @@ Building a production-grade CLI tool (`npx custom-push init`) that sets up Fireb
 ### MISSING COMPONENTS (From skills.md review)
 The existing code follows structure.md but is missing some key features from skills.md:
 
-#### [PENDING] Missing Utils
+#### PENDING] Missing Utils
 - **File Utils**: `lib/utils/fileUtils.ts` - filesystem operations
 - **Template Engine**: `lib/core/templateEngine.ts` - {{VAR}} replacement
 - **Spinner Utility**: `lib/utils/spinner.ts` - referenced but may need implementation
 
-#### [PENDING] Missing Core Functions
+#### PENDING] Missing Core Functions
 - **Conflict Detection**: `lib/core/checkConflicts.ts` - file conflict resolution UI
 - **Template Engine Implementation**: {{VAR}} token replacement logic
 
-#### [PENDING] Missing Templates
+#### PENDING] Missing Templates
 - **Backend Templates**: Express/NestJS helper files
 - **Template Processing**: Integration with template engine
 
-#### [PENDING] Missing Entry Point
+#### PENDING] Missing Entry Point
 - **Main Index**: `dist/index.js` exports main function
 - **CLI Entry**: `bin/cli.js` points to compiled output
 
@@ -40,9 +40,9 @@ The existing code follows structure.md but is missing some key features from ski
 
 ## IMPLEMENTATION TASKS
 
-### 🔴 HIGH PRIORITY - Core Missing Features
+###  HIGH PRIORITY - Core Missing Features
 
-#### [PENDING] File Utils Implementation
+#### PENDING] File Utils Implementation
 - **File**: `lib/utils/fileUtils.ts`
 - **Functions needed**:
   - `fileExists(filePath: string): Promise<boolean>`
@@ -55,19 +55,19 @@ The existing code follows structure.md but is missing some key features from ski
   - `appendToFile(filePath: string, line: string): Promise<void>`
   - `ensureDir(dirPath: string): Promise<void>`
 
-#### [PENDING] Template Engine Implementation
+#### PENDING] Template Engine Implementation
 - **File**: `lib/core/templateEngine.ts`
 - **Function**: `renderTemplate(template: string, vars: Record<string, string>): string`
 - **Logic**: Replace all `{{KEY}}` with vars[KEY], empty string if missing
 
-#### [PENDING] Conflict Detection System
+#### PENDING] Conflict Detection System
 - **File**: `lib/core/checkConflicts.ts`
 - **Function**: `checkConflicts(filesToWrite, project) -> Promise<actions>`
 - **Features**: Overwrite/Skip/View/Diff options with interactive prompts
 
-### 🟡 MEDIUM PRIORITY - Template Integration
+###  MEDIUM PRIORITY - Template Integration
 
-#### [PENDING] Complete Backend Templates
+#### PENDING] Complete Backend Templates
 - **Express Templates**: 
   - `lib/templates/backend/express/pushHelper.ts.tpl`
   - `lib/templates/backend/express/pushHelper.js.tpl`
@@ -77,18 +77,18 @@ The existing code follows structure.md but is missing some key features from ski
   - `lib/templates/backend/nestjs/push.service.ts.tpl`
   - `lib/templates/backend/nestjs/push.controller.ts.tpl`
 
-#### [PENDING] Service Worker Template
+#### PENDING] Service Worker Template
 - **File**: `lib/templates/sw.template.js`
 - **Status**: May exist but needs integration with template engine
 
-### 🟢 LOW PRIORITY - Integration & Testing
+###  LOW PRIORITY - Integration & Testing
 
-#### [PENDING] Main Index Export
+#### PENDING] Main Index Export
 - **File**: `src/index.ts` (or update existing)
 - **Function**: Export main() that calls init()
 - **Integration**: Ensure bin/cli.js can call the main function
 
-#### [PENDING] End-to-End Testing
+#### PENDING] End-to-End Testing
 - Test complete flow with different project types
 - Test conflict resolution UI
 - Test template generation
@@ -166,7 +166,7 @@ lib/
 
 ## TASK COMPLETION SUMMARY
 
-### ✅ ALL TASKS COMPLETED
+###  ALL TASKS COMPLETED
 
 1. **✅ File Utils Implementation** - `lib/utils/fileUtils.ts`
    - All filesystem operations implemented

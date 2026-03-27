@@ -87,8 +87,8 @@ export async function printSummary(context: CLIContext): Promise<void> {
     logger.raw(`      It has complete integration instructions.`)
     logger.blank()
 
-    logger.raw(`  [2] Wrap your app with <PushProvider>:`)
-    logger.raw(`      import { PushProvider } from './push-notification/pushProvider'`)
+    logger.raw(`  [2] Wrap your app with <CustomPushProvider>:`)
+    logger.raw(`      import { CustomPushProvider } from './push-notification/pushProvider'`)
     logger.blank()
 
     logger.raw(`  [3] Request permission from a button click (required for Safari):`)

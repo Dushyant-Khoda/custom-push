@@ -41,10 +41,13 @@ custom-push init
 ### Will this work with my existing React project?
 Yes! The CLI is designed to work with any React project:
 - Create React App
-- Next.js
+- Next.js (Pages and App Router)
 - Vite
 - Custom webpack setups
 - TypeScript or JavaScript
+
+### Does it work with Next.js App Router?
+Yes. The `CustomPushProvider` and `usePushMessage` hook are marked with `'use client'`, making them fully compatible with the Next.js App Router. You should wrap your app (or specific layouts) in a Client Component that includes the provider. See [Next.js Example](./EXAMPLES.md#nextjs-app-router-integration).
 
 ## Configuration
 
@@ -193,25 +196,25 @@ You're responsible for:
 
 ## Troubleshooting
 
-### "No package.json found"
+### No package.json found"
 Make sure you're running the command from your React project root directory where `package.json` is located.
 
-### "Permission denied"
+### Permission denied"
 Users must enable notifications in their browser settings. Provide clear instructions in your UI.
 
-### "Service worker failed to register"
+### Service worker failed to register"
 Check that:
 - Service worker is in `public/` directory
 - You're using HTTPS (or localhost)
 - No JavaScript errors in console
 
-### "Notifications not working in production"
+### Notifications not working in production"
 Verify:
 - HTTPS is properly configured
 - Firebase project settings include your production domain
 - Service worker is accessible at the correct path
 
-### "Backend token registration fails"
+### Backend token registration fails"
 Check:
 - Backend is running and accessible
 - CORS is configured correctly

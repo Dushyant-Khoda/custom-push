@@ -1,3 +1,5 @@
+'use client'
+
 import { useContext } from 'react'
 import { PushContext } from './CustomPushProvider'
 import { PushContextValue } from './types'

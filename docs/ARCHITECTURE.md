@@ -69,27 +69,27 @@ function App() {
 ### Old Workflow (CLI generates everything)
 ```bash
 npx custom-push init
-# → Generates backend + frontend files
-# → User integrates generated frontend code
+#  Generates backend + frontend files
+#  User integrates generated frontend code
 ```
 
 ### New Workflow (Backend-focused)
 ```bash
 # Step 1: Backend setup
 npx custom-push init
-# → Generates backend scaffolding only
-# → Shows package installation instructions
+#  Generates backend scaffolding only
+#  Shows package installation instructions
 
 # Step 2: Frontend integration
 npm install custom-push
-# → Import and configure in app
+#  Import and configure in app
 ```
 
 ### Optional Frontend Generation
 ```bash
 npx custom-push init --generate-frontend
-# → Generates backend + frontend boilerplate
-# → For users who prefer generated files
+#  Generates backend + frontend boilerplate
+#  For users who prefer generated files
 ```
 
 ## Architecture Benefits

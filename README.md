@@ -11,9 +11,9 @@ A production-grade CLI tool that scaffolds Firebase Cloud Messaging backend infr
 ## Features
 
 - **Backend-focused** - Scaffolds Express/NestJS helpers and routes
--  **Package-based Frontend** - Frontend logic handled by `custom-push` npm package
--  **Flexible Options** - Backend-only, package-based, or full boilerplate generation
--  **Service Worker Generator** - On-demand service worker generation
+- **Package-based Frontend** - Frontend logic handled by `custom-push` npm package
+- **Flexible Options** - Backend-only, package-based, or full boilerplate generation
+- **Service Worker Generator** - On-demand service worker generation
 - **Minimal Prompts** - Backend-focused configuration by default
 - **Version Validation** - Validates Firebase and React compatibility
 - **Production Ready** - Generates complete, working backend code
@@ -38,7 +38,7 @@ Full source-code generation for complete customization.
 npx custom-push init --generate-frontend
 ```
 
-##  Frontend Package Integration
+## Frontend Package Integration
 
 ### 1. Install the package
 ```bash
@@ -86,7 +86,7 @@ function App() {
 }
 ```
 
-##  What It Does
+## What It Does
 
 ### Backend (Default)
 - ✅ Express/NestJS helpers and routes
@@ -191,7 +191,7 @@ await sendPushNotification({
 - **Backend**: Express or NestJS (optional)
 - **Firebase**: Free Firebase project
 
-## � Documentation
+##  Documentation
 
 - 📖 **[Architecture Guide](./docs/ARCHITECTURE.md)** - New architecture overview
 - **[Installation Guide](./docs/INSTALLATION.md)** - Detailed setup instructions
@@ -207,7 +207,7 @@ await sendPushNotification({
 
 The CLI will warn you about version mismatches and ask for confirmation before proceeding.
 
-## � Development
+##  Development
 
 ### Build
 ```bash
@@ -225,7 +225,7 @@ npm link
 custom-push --help
 ```
 
-##  Use Cases
+## Use Cases
 
 | Scenario | Command | Description |
 |----------|---------|-------------|
@@ -275,7 +275,7 @@ The CLI analyzes your project and sets up everything needed for push notificatio
 - ✅ Token registration endpoints
 - ✅ Credentials handling with .gitignore
 
-##  Usage
+## Usage
 
 ### 1. Run the CLI
 ```bash
@@ -340,7 +340,7 @@ your-project/
 ## Configuration
 
 All configuration is stored in `our_pkg.json`:
-## `our_pkg.json`
+## our_pkg.json`
 
 ```json
 {
@@ -393,7 +393,7 @@ The CLI will detect existing files and ask whether to overwrite or skip each one
 
 ---
 
-## `credentials.json`
+## credentials.json`
 
 This is your **Firebase service account private key**. It is required for sending push notifications from your backend.
 

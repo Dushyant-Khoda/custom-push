@@ -4,7 +4,7 @@
 
 ### Installation Issues
 
-#### "command not found: custom-push"
+#### command not found: custom-push"
 **Problem**: CLI not recognized after global install.
 
 **Solutions**:
@@ -22,7 +22,7 @@ npm config get prefix
 export PATH=$(npm config get prefix)/bin:$PATH
 ```
 
-#### "permission denied" errors
+#### permission denied" errors
 **Problem**: npm permissions issue.
 
 **Solutions**:
@@ -39,7 +39,7 @@ nvm install 18
 nvm use 18
 ```
 
-#### "No package.json found"
+#### No package.json found"
 **Problem**: Not running from React project root.
 
 **Solutions**:
@@ -56,7 +56,7 @@ npx custom-push init
 
 ### Firebase Configuration Issues
 
-#### "Invalid Firebase config"
+#### Invalid Firebase config"
 **Problem**: Missing or incorrect Firebase configuration.
 
 **Solutions**:
@@ -83,7 +83,7 @@ npx custom-push init
    - Wrong project ID
    - API key from wrong project
 
-#### "VAPID key invalid"
+#### VAPID key invalid"
 **Problem**: Incorrect or missing VAPID key.
 
 **Solutions**:
@@ -99,7 +99,7 @@ npx custom-push init
 
 ### Browser Permission Issues
 
-#### "Notification permission denied"
+#### Notification permission denied"
 **Problem**: User blocked notification permissions.
 
 **Solutions**:
@@ -125,7 +125,7 @@ npx custom-push init
    })
    ```
 
-#### "Service worker failed to register"
+#### Service worker failed to register"
 **Problem**: Service worker registration fails.
 
 **Solutions**:
@@ -148,7 +148,7 @@ npx custom-push init
 
 ### Backend Integration Issues
 
-#### "Token registration failed"
+#### Token registration failed"
 **Problem**: Backend endpoint not working.
 
 **Solutions**:
@@ -173,7 +173,7 @@ npx custom-push init
    - Must be accessible to backend
    - Check file permissions
 
-#### "Firebase Admin SDK error"
+#### Firebase Admin SDK error"
 **Problem**: Backend Firebase initialization fails.
 
 **Solutions**:
@@ -207,7 +207,7 @@ npx custom-push init
 
 ### Version Compatibility Issues
 
-#### "Firebase version mismatch"
+#### Firebase version mismatch"
 **Problem**: Firebase version not compatible.
 
 **Solutions**:
@@ -227,7 +227,7 @@ npx custom-push init
    - CLI will ask if you want to continue
    - Some features may not work with incompatible versions
 
-#### "React version too old"
+#### React version too old"
 **Problem**: React version not supported.
 
 **Solutions**:
@@ -242,7 +242,7 @@ npx create-react-app@latest new-app
 
 ### Development Environment Issues
 
-#### "TypeScript compilation errors"
+#### TypeScript compilation errors"
 **Problem**: Generated TypeScript files have errors.
 
 **Solutions**:
@@ -268,7 +268,7 @@ npx create-react-app@latest new-app
    - Files should be in `src/push/` directory
    - Extensions should match project language (.ts or .js)
 
-#### "Hot reload not working"
+#### Hot reload not working"
 **Problem**: Changes not reflected in development.
 
 **Solutions**:
@@ -293,7 +293,7 @@ npx create-react-app@latest new-app
 
 ### Production Issues
 
-#### "Push notifications not working in production"
+#### Push notifications not working in production"
 **Problem**: Works in development but not production.
 
 **Solutions**:
@@ -313,7 +313,7 @@ npx create-react-app@latest new-app
    - Send test notification from Firebase Console
    - Check if it appears in production
 
-#### "High error rate in production"
+#### High error rate in production"
 **Problem**: Many failed push notifications.
 
 **Solutions**:
@@ -453,5 +453,5 @@ For automated deployments:
   run: npx custom-push init --yes
   env:
     FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
-    # ... other env vars
+    #  other env vars
 ```

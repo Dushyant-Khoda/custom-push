@@ -35,8 +35,7 @@ export const spinners = {
   star: { interval: 70, frames: ['✶', '✸', '✹', '✺', '✹', '✷'] },
   arrow: { interval: 80, frames: ['←', '↖', '↑', '↗', '→', '↘', '↓', '↙'] },
   pulse: { interval: 80, frames: ['◐', '◓', '◑', '◒'] },
-  moon: { interval: 80, frames: ['🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘'] },
-  rocket: { interval: 120, frames: ['🚀', '💫', '⭐', '✨'] }
+  moon: { interval: 80, frames: ['🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘'] }
 }
 
 // Enhanced spinner creation with branding
@@ -140,7 +139,7 @@ export function successAnimation(message: string): void {
 // Error display
 export function showError(title: string, message: string, suggestion?: string): void {
   console.log()
-  console.log(brand.error('✗ ' + title))
+  console.log(brand.error('✕ ' + title))
   console.log(brand.muted('   ' + message))
   if (suggestion) {
     console.log(brand.info('Tip: ' + suggestion))
@@ -151,7 +150,7 @@ export function showError(title: string, message: string, suggestion?: string): 
 // Warning display
 export function showWarning(title: string, message: string): void {
   console.log()
-  console.log(brand.warning('⚠ ' + title))
+  console.log(brand.warning('! ' + title))
   console.log(brand.muted('   ' + message))
   console.log()
 }
@@ -159,7 +158,7 @@ export function showWarning(title: string, message: string): void {
 // Info display
 export function showInfo(title: string, message: string): void {
   console.log()
-  console.log(brand.info('ℹ ' + title))
+  console.log(brand.info('i ' + title))
   console.log(brand.muted('   ' + message))
   console.log()
 }

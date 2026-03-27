@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.1.2] - 2026-03-27
+## 1.1.2] - 2026-03-27
 
 ### Added
 - **Professional Backend-Only Mode**: A dedicated, zero-fluff setup flow specifically for server-side push engines.
@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Branding Cleanup**: Eliminated duplicate branding headers in `init` and `generate-sw` commands for a single, professional welcome experience.
 - **Logic Refinement**: Corrected a validation bug where backend-only mode was skipping mandatory dependency checks.
 
-## [1.0.0] - 2024-03-26
+## 1.0.0] - 2024-03-26
 
 ### Added
 - Initial release of custom-push CLI
@@ -113,7 +113,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Safe file operations with proper permissions
 - No sensitive data in generated code
 
-## [Upcoming Features]
+## Upcoming Features]
 
 ### Planned for v1.1.0
 - Advanced project detection (Next.js, Remix, etc.)
