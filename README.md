@@ -10,50 +10,61 @@ Custom Push is a production-grade CLI tool that scaffolds robust Firebase Cloud 
 
 ## Features
 
+- **Zero-Config Frontend** - Automatically scaffolds a ready-to-use notification handler
 - **Backend-focused** - Scaffolds production-grade `FCMHelper` and routes
 - **Package-based Frontend** - Core logic handled by the `custom-push` React package
 - **App Router Support** - Fully compatible with Next.js 13+ (includes `'use client'` directives)
-- **Flexible Workflows** - Support for Backend-only, Package-based, or full Boilerplate generation
 - **Service Worker Engine** - Integrated on-demand service worker registration
 - **Proactive Validation** - Mandatory dependency checks for both `firebase-admin` and `firebase`
 - **Minimal Prompts** - Intelligent project detection reduces setup to maximum 4 questions
 
-## Quick Start
+## Quick Start (3 Minutes)
 
 ### 1. Initialize
 ```bash
-# Recommended for most projects
 npx custom-push init
 ```
 
-### 2. Specialized Flows
-```bash
-# Backend-only engine (Zero frontend fluff)
-npx custom-push init --backend-only
+### 2. Wrap your application (Recommended)
+The CLI automatically generates a `src/push/notificationHandler/` directory. Use it to wrap your app:
 
-# Maximum control (Full source-code generation)
-npx custom-push init --generate-frontend
+```tsx
+import { CustomPushProvider } from 'custom-push';
+import { pushConfig } from './push/notificationHandler/pushConfig';
+import { PushNotificationManager } from './push/notificationHandler/PushNotificationManager';
+
+function RootLayout({ children }) {
+  return (
+    <CustomPushProvider config={pushConfig}>
+      {/* 💎 This component handles all foreground notifications and toasts */}
+      <PushNotificationManager />
+      {children}
+    </CustomPushProvider>
+  );
+}
 ```
 
-## Frontend Integration (React / Next.js)
+### 3. Add an "Enable Notifications" Button
+Check the generated `src/push/notificationHandler/USAGE.md` for a professional, copy-pasteable permission toggle button.
+
+## Advanced Frontend Integration
+
+For developers who need full control or prefer not to use the scaffolded handler:
 
 ### 1. Install the package
 ```bash
 npm install custom-push
 ```
 
-### 2. Wrap your application
+### 2. Manual Config
 ```typescript
 import { CustomPushProvider } from 'custom-push';
 
 const pushConfig = {
   apiKey: "your-api-key",
-  authDomain: "your-project.firebaseapp.com",
   projectId: "your-project-id",
-  storageBucket: "your-project.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef",
   vapidKey: "your-vapid-key"
+  // ...
 };
 
 function Root() {
@@ -65,23 +76,18 @@ function Root() {
 }
 ```
 
-### 3. Use the hook
-```typescript
-import { usePushMessage } from 'custom-push';
+### 3. Core Frontend API
+The `usePushMessage` hook provides a complete interface:
 
-function App() {
-  const { requestPermission, token, messages } = usePushMessage();
-
-  return (
-    <div>
-      <button onClick={() => requestPermission()}>
-        Enable Notifications
-      </button>
-      {token && <p>Token ready: {token.slice(0, 10)}...</p>}
-    </div>
-  );
-}
-```
+| Property | Type | Description |
+|----------|------|-------------|
+| `token` | `string \| null` | The unique FCM device token. |
+| `messages` | `PushMessage[]` | Array of foreground notifications received. |
+| `isSupported` | `boolean` | Whether the browser supports Web Push. |
+| `isPermissionGranted` | `boolean` | Current notification permission status. |
+| `requestPermission` | `() => Promise<boolean>` | Triggers the browser permission prompt (Required for Safari). |
+| `sendMessage` | `(title, body, data?) => Promise<void>` | Sends a push via your configured backend. |
+| `clearMessages` | `() => void` | Clears the local `messages` state. |
 
 ## Backend Scaffolding
 
@@ -101,37 +107,21 @@ await sendPushNotification({
 
 ## Configuration
 
-All local configuration is stored in `our_pkg.json`. This acts as the single source of truth for both your CLI and runtime integration.
+All local configuration is stored in `our_pkg.json`. This acts as the single source of truth.
 
 ```json
 {
-  "stack": {
-    "language": "typescript",
-    "scope": "both",
-    "backendFramework": "express"
-  },
-  "firebase": {
-    "apiKey": "...",
-    "vapidKey": "..."
-  },
-  "backend": {
-    "registerUrl": "http://localhost:3000/push/register"
-  }
+  "stack": { "language": "typescript", "scope": "both", "backendFramework": "express" },
+  "firebase": { "apiKey": "...", "vapidKey": "..." },
+  "backend": { "registerUrl": "http://localhost:3000/push/register" }
 }
 ```
 
-## Requirements
-
-- **Node.js**: >= 18.0.0
-- **Frameworks**: Express, NestJS, Next.js, Vite, CRA
-- **Firebase**: Free or Blaze tier project
-
 ## Documentation
 
-- **[Installation Guide](./docs/INSTALLATION.md)** - Detailed system requirements and setup
-- **[Architecture Overview](./docs/ARCHITECTURE.md)** - Understanding the Elite workflow
+- **[Installation Guide](./docs/INSTALLATION.md)** - Requirements and Firebase setup
 - **[API Reference](./docs/API.md)** - Detailed provider and helper documentation
-- **[Examples](./docs/EXAMPLES.md)** - Real-world patterns (Next.js, Auth, etc.)
+- **[Examples](./docs/EXAMPLES.md)** - Next.js, Auth, and payload samples
 - **[FAQ](./docs/FAQ.md)** - Common questions and troubleshooting
 
 ## License

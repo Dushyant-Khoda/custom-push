@@ -2,12 +2,57 @@
 
 ## Table of Contents
 
+- [x] [Zero-Config Integration (Recommended)](#zero-config-integration-recommended)
 - [Basic Setup](#basic-setup)
 - [React Integration](#react-integration)
 - [Frontend Package Integration](#frontend-package-integration)
 - [Backend Integration](#backend-integration)
 - [Advanced Patterns](#advanced-patterns)
 - [Real-world Scenarios](#real-world-scenarios)
+
+## Zero-Config Integration (Recommended)
+
+The CLI automatically scaffolds a `src/push/notificationHandler/` directory designed for almost zero-effort integration.
+
+### 1. Minimal App Wrap
+Simply wrap your application with the pre-configured provider and manager.
+
+```tsx
+// layout.tsx or App.tsx
+import { CustomPushProvider } from 'custom-push';
+import { pushConfig } from './push/notificationHandler/pushConfig';
+import { PushNotificationManager } from './push/notificationHandler/PushNotificationManager';
+
+export default function RootLayout({ children }) {
+  return (
+    <CustomPushProvider config={pushConfig}>
+      {/* 💎 Global logic: handles all tokens and foreground notifications */}
+      <PushNotificationManager />
+      {children}
+    </CustomPushProvider>
+  );
+}
+```
+
+### 2. Customizing Notification UX
+Open `PushNotificationManager.tsx` to plug in your favorite toast library:
+
+```tsx
+// PushNotificationManager.tsx snippet
+useEffect(() => {
+  if (messages.length > 0) {
+    const lastMessage = messages[messages.length - 1];
+    
+    // 🚀 REPLACE THIS with Sonner, React Hot Toast, etc.
+    toast(lastMessage.title, { description: lastMessage.body });
+  }
+}, [messages]);
+```
+
+### 3. Permission Button
+See the `USAGE.md` in your scaffolded folder for a professional toggle button example.
+
+---
 
 ## Basic Setup
 

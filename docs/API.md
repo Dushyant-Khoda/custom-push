@@ -163,6 +163,24 @@ const {
 
 ---
 
+### Zero-Config Scaffolding (Recommended)`
+
+The CLI provides a pre-architected integration at `src/push/notificationHandler/`.
+
+#### PushNotificationManager.tsx`
+A Client Component that monitors `usePushMessage` to handle:
+-   **Token Logging**: Logs the current FCM token for development.
+*   **Foreground Toasts**: Provides a hook to plug in a toast library for active-tab notifications.
+*   **Permission Monitoring**: Emits warnings if permissions are denied.
+
+#### pushConfig.ts`
+An automated configuration file that spreads values from your `our_pkg.json`. This ensures that updating the CLI config also updates your app's frontend configuration.
+
+#### USAGE.md`
+A localized integration guide with copy-pasteable snippets for layouts and UI components.
+
+---
+
 ### Message Structure
 
 ```typescript

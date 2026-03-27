@@ -2,6 +2,22 @@
 
 Welcome to the **Custom Push CLI** documentation. This toolkit provides a production-grade infrastructure for Firebase Cloud Messaging (FCM) push notifications.
 
+## Quick Usage
+
+```typescript
+import { usePushMessage } from 'custom-push';
+
+function App() {
+  const { requestPermission, token, messages } = usePushMessage();
+  
+  return (
+    <button onClick={() => requestPermission()}>
+      {token ? 'Enabled' : 'Enable Notifications'}
+    </button>
+  );
+}
+```
+
 ## Getting Started
 
 ### Complete Integration Guide

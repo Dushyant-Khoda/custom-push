@@ -11,6 +11,9 @@ import {
   FRONTEND_HELPER_JS,
   SERVICE_WORKER_FILENAME,
   SERVICE_WORKER_FALLBACK_FILENAME,
+  FRONTEND_MANAGER_TPL,
+  FRONTEND_CONFIG_TPL,
+  FRONTEND_USAGE_TPL,
 } from '../constants'
 
 export async function scaffoldFrontend(context: CLIContext): Promise<ScaffoldedFile[]> {
@@ -55,8 +58,20 @@ export async function scaffoldFrontend(context: CLIContext): Promise<ScaffoldedF
   const helperContent = await readFile(helperTemplatePath)
   const helperPath = path.join(project.srcDir, 'push', `pushHelper.${ext}`)
 
-  // ── Ensure push directory exists ──────────────────────────────────────
-  await ensureDir(path.join(project.srcDir, 'push'))
+  // ── Ensure directories exist ──────────────────────────────────────────
+  const pushDir = path.join(project.srcDir, 'push')
+  const handlerDir = path.join(pushDir, 'notificationHandler')
+  await ensureDir(pushDir)
+  await ensureDir(handlerDir)
+
+  // ── 3. Zero-Config Handler Files ──────────────────────────────────────
+  const managerTemplate = await readFile(path.join(TEMPLATES_DIR, FRONTEND_MANAGER_TPL))
+  const configTemplate = await readFile(path.join(TEMPLATES_DIR, FRONTEND_CONFIG_TPL))
+  const usageTemplate = await readFile(path.join(TEMPLATES_DIR, FRONTEND_USAGE_TPL))
+
+  const managerPath = path.join(handlerDir, `PushNotificationManager.${project.language === 'typescript' ? 'tsx' : 'js'}`)
+  const configPath = path.join(handlerDir, `pushConfig.${ext}`)
+  const usagePath = path.join(handlerDir, 'USAGE.md')
 
   // ── Run conflict checks ───────────────────────────────────────────────
   const filesToWrite = [
@@ -69,6 +84,21 @@ export async function scaffoldFrontend(context: CLIContext): Promise<ScaffoldedF
       path: helperPath,
       content: helperContent,
       description: 'Frontend helper — import usePush() anywhere in your app',
+    },
+    {
+      path: managerPath,
+      content: managerTemplate,
+      description: 'Zero-config Notification Manager component',
+    },
+    {
+      path: configPath,
+      content: configTemplate,
+      description: 'Auto-syncing configuration file',
+    },
+    {
+      path: usagePath,
+      content: usageTemplate,
+      description: 'Quick usage guide for your notificationHandler',
     },
   ]
 

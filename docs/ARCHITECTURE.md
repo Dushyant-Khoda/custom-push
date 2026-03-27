@@ -130,13 +130,15 @@ When a file collision occurs (e.g., `FCMHelper.js` already exists), the CLI offe
 - **Rename with Date**: Appends the current date to the filename (e.g., `FCMHelper-27-03.js`).
 - **Benefits**: Preserves project history without polluting the CLI with complex diffing logic when not needed.
 
-### Package-based Frontend
+### Package-based Frontend (Recommended)
 ```
 your-project/
 ├── node_modules/custom-push/       # Runtime logic
 ├── public/firebase-messaging-sw.js # Service worker
-└── src/
-    └── App.tsx                     # Zero-boilerplate integration
+└── src/push/notificationHandler/   # Zero-Config Setup
+    ├── pushConfig.ts               # Auto-syncing configuration
+    ├── PushNotificationManager.tsx  # Global logic component
+    └── USAGE.md                    # Localized integration guide
 ```
 
 ### Generated Frontend (Optional)
@@ -164,11 +166,12 @@ your-project/
 4. **Error Handling**: Comprehensive error management
 5. **TypeScript Support**: Full type definitions
 
-### Configuration Flow
 1. **CLI generates** `our_pkg.json` with Firebase config
-2. **Package reads** configuration from user input
-3. **Service worker** generated on-demand with user's config
-4. **Backend integration** via generated endpoints
+2. **scaffoldFrontend** creates `notificationHandler` with `pushConfig.ts`
+3. **pushConfig.ts** imports `our_pkg.json` for live-syncing
+4. **Package reads** configuration from `pushConfig.ts` in your app
+5. **Service worker** generated on-demand with user's config
+6. **Backend integration** via generated endpoints
 
 ##  Use Cases
 

@@ -102,13 +102,17 @@ export async function printSummary(context: CLIContext): Promise<void> {
 
     logger.raw(`  [2] Wrap your app root:`)
     logger.raw(`      import { CustomPushProvider } from 'custom-push'`)
-    logger.raw(`      <CustomPushProvider config={pushConfig}><App /></CustomPushProvider>`)
+    logger.raw(`      import { pushConfig } from './push/notificationHandler/pushConfig'`)
+    logger.raw(`      import { PushNotificationManager } from './push/notificationHandler/PushNotificationManager'`)
+    logger.blank()
+    logger.raw(`      <CustomPushProvider config={pushConfig}>`)
+    logger.raw(`        <PushNotificationManager />`)
+    logger.raw(`        <App />`)
+    logger.raw(`      </CustomPushProvider>`)
     logger.blank()
 
-    logger.raw(`  [3] Request permission from a button click (required for Safari):`)
-    logger.raw(`      import { usePushMessage } from 'custom-push'`)
-    logger.raw(`      const { requestPermission } = usePushMessage()`)
-    logger.raw(`      <button onClick={() => requestPermission()}>Enable</button>`)
+    logger.raw(`  [3] Add a permission toggle button:`)
+    logger.raw(`      Check the USAGE.md in src/push/notificationHandler/`)
     logger.blank()
   }
 
