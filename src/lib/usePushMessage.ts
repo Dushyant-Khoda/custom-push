@@ -4,6 +4,11 @@ import { PushContextValue } from './types'
 
 export function usePushMessage(): PushContextValue {
   const ctx = useContext(PushContext)
-  if (!ctx) throw new Error('usePushMessage must be used inside <CustomPushProvider>')
+  if (!ctx) {
+    throw new Error(
+      'usePushMessage must be used inside <CustomPushProvider>. ' +
+      'Wrap your app root with <CustomPushProvider config={...}>.'
+    )
+  }
   return ctx
 }

@@ -1,5 +1,5 @@
 import { confirm } from '@inquirer/prompts'
-import { CLIContext } from '../types'
+import { CLIContext, InitMode } from '../types'
 import { createSpinner } from '../utils/spinner'
 import { printSummary } from '../utils/printSummary'
 import { detectProject } from '../core/detectProject'
@@ -9,14 +9,22 @@ import { runPrompts } from '../modules/runPrompts'
 import { generateConfig } from '../modules/generateConfig'
 import { scaffoldFrontend } from '../modules/scaffoldFrontend'
 import { scaffoldBackend } from '../modules/scaffoldBackend'
+import { scaffoldFiles } from '../modules/scaffoldFiles'
+import { logger } from '../utils/logger'
 import { showStep, messages, successAnimation } from '../utils/branding'
+import { SERVICE_WORKER_FILENAME } from '../constants'
 
-export async function init(options: { generateFrontend?: boolean; backendOnly?: boolean } = {}): Promise<void> {
+export async function init(options: {
+  files?: boolean
+  generateFrontend?: boolean
+  backendOnly?: boolean
+} = {}): Promise<void> {
   const cwd = process.cwd()
-  const { generateFrontend = false, backendOnly = false } = options
+  const { files = false, generateFrontend = false, backendOnly = false } = options
+  const mode: InitMode = files ? 'files' : 'library'
 
   // Show welcome message
-  console.log(messages.welcome)
+  logger.raw(messages.welcome)
 
   // ── Step 1: Detect project ────────────────────────────────────────────
   showStep(1, 'Analyzing project structure...')
@@ -24,36 +32,43 @@ export async function init(options: { generateFrontend?: boolean; backendOnly?: 
   detectSpin.start()
   const project = await detectProject(cwd)
   detectSpin.succeed('Project detected successfully')
-  
-  console.log(`   ${messages.success.detected}`)
-  console.log(`   Language: ${project.language}`)
-  console.log(`   React: ${project.reactVersion ? '✓' : '✗'}`)
-  console.log(`   Firebase: ${project.hasFirebase ? '✓' : '✗'}`)
-  console.log(`   Scope: ${project.scope}`)
+
+  logger.info(`   Language: ${project.language}`)
+  logger.info(`   React: ${project.reactVersion ? `✓ v${project.reactVersion}` : '✗ not found'}`)
+  logger.info(`   Firebase: ${project.hasFirebase ? `✓ v${project.firebaseVersion}` : '✗ not found'}`)
+  logger.info(`   Framework: ${project.isNextJs ? 'Next.js' : project.isVite ? 'Vite' : 'React'}`)
+  logger.info(`   Backend: ${project.backendFramework || 'none'}`)
+  logger.info(`   Mode: ${mode}`)
 
   // ── Step 2: Validate versions ───────────────────────────────────────────
   showStep(2, 'Validating dependencies...')
   const validateSpin = createSpinner('Checking version compatibility...', 'pulse')
   validateSpin.start()
-  const warnings = await validateVersions(project)
+  const warnings = validateVersions(project)
   validateSpin.succeed('Version validation complete')
 
   if (warnings.length > 0) {
-    console.log()
-    console.log(messages.warning.incompatible)
-    warnings.forEach(warning => {
-      console.log(`   ${warning}`)
+    logger.blank()
+    logger.warn('⚠  Version compatibility issues found:')
+    for (const w of warnings) {
+      logger.warn(`   ${w.package} version mismatch`)
+      logger.info(`      Found:    ${w.found}`)
+      logger.info(`      Required: ${w.required}`)
+      logger.info(`      Fix:      ${w.fix}`)
+    }
+    logger.blank()
+
+    const shouldContinue = await confirm({
+      message: 'Versions above may cause issues. Continue anyway?',
+      default: false,
     })
-    
-    const answers = await runPrompts(project, { backendOnly })
-    if (!answers) {
-      console.log()
-      console.log(messages.error.cancelled)
+
+    if (!shouldContinue) {
+      logger.info('Fix the above and re-run: npx custom-push init')
       process.exit(0)
     }
-    
-    console.log()
-    console.log(messages.warning.proceeding)
+
+    logger.warn('Proceeding with incompatible versions. Things may break.')
   }
 
   // ── Step 3: Run prompts ───────────────────────────────────────────────
@@ -61,7 +76,14 @@ export async function init(options: { generateFrontend?: boolean; backendOnly?: 
   const answers = await runPrompts(project, { backendOnly })
 
   // ── Build context ─────────────────────────────────────────────────────
-  const context: CLIContext = { project, answers, scaffolded: [], warnings }
+  const context: CLIContext = {
+    project,
+    answers,
+    scaffolded: [],
+    warnings,
+    mode,
+    serviceWorkerFilename: SERVICE_WORKER_FILENAME,
+  }
 
   // ── Step 4: Process credentials ───────────────────────────────────────
   if (answers.credentialsPath) {
@@ -80,19 +102,30 @@ export async function init(options: { generateFrontend?: boolean; backendOnly?: 
   await generateConfig(context)
   configSpin.succeed('Configuration file created')
 
-  // ── Step 6: Scaffold frontend (optional) ────────────────────────────────
-  if (generateFrontend && !backendOnly) {
-    showStep(6, 'Building frontend components...')
-    const frontSpin = createSpinner('Generating frontend boilerplate...', 'rocket')
-    frontSpin.start()
-    context.scaffolded.push(...(await scaffoldFrontend(context)))
-    frontSpin.succeed('Frontend scaffolding complete')
+  // ── Step 6: Scaffold based on mode ────────────────────────────────────
+  if (mode === 'files') {
+    // --files mode: generate standalone files into src/push-notification/
+    showStep(6, 'Generating standalone push notification files...')
+    const filesSpin = createSpinner('Scaffolding push-notification files...', 'rocket')
+    filesSpin.start()
+    context.scaffolded.push(...(await scaffoldFiles(context)))
+    filesSpin.succeed('Standalone files generated')
   } else if (!backendOnly) {
-    console.log()
-    console.log(messages.next.install)
-    console.log(messages.next.import)
-    console.log(messages.next.wrap)
-    console.log(messages.next.test)
+    // Library mode: scaffold frontend boilerplate
+    if (generateFrontend) {
+      showStep(6, 'Building frontend components...')
+      const frontSpin = createSpinner('Generating frontend boilerplate...', 'rocket')
+      frontSpin.start()
+      context.scaffolded.push(...(await scaffoldFrontend(context)))
+      frontSpin.succeed('Frontend scaffolding complete')
+    } else {
+      // Default library mode — generate service worker + show import instructions
+      showStep(6, 'Generating service worker...')
+      const swSpin = createSpinner('Creating service worker file...', 'rocket')
+      swSpin.start()
+      context.scaffolded.push(...(await scaffoldFrontend(context)))
+      swSpin.succeed('Service worker generated')
+    }
   }
 
   // ── Step 7: Scaffold backend ──────────────────────────────────────────

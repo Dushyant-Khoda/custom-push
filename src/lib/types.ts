@@ -6,8 +6,9 @@ export interface PushConfig {
   messagingSenderId?: string
   appId?: string
   vapidKey?: string
-  registerUrl?: string       // POST endpoint to save token to backend
-  unregisterUrl?: string     // POST endpoint to remove token from backend
+  registerUrl?: string         // POST endpoint to save token to backend
+  unregisterUrl?: string       // POST endpoint to remove token from backend
+  serviceWorkerPath?: string   // path to SW file (default: /firebase-messaging-sw.js)
 }
 
 export interface PushMessage {
@@ -21,6 +22,14 @@ export interface PushMessage {
   timestamp: number
 }
 
+export interface BrowserSupport {
+  isSupported: boolean         // can the browser do Web Push at all?
+  isSafari: boolean            // is this Safari?
+  safariVersion: number | null // Safari major version (null if not Safari)
+  requiresUserGesture: boolean // Safari requires user gesture for permission
+  reason?: string              // human-readable reason if not supported
+}
+
 export interface PushContextValue {
   token: string | null
   messages: PushMessage[]
@@ -28,5 +37,7 @@ export interface PushContextValue {
   clearMessages: () => void
   isSupported: boolean
   isPermissionGranted: boolean
+  isTabActive: boolean
+  browserSupport: BrowserSupport
   requestPermission: () => Promise<boolean>
 }

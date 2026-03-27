@@ -1,16 +1,22 @@
 import { input, confirm } from '@inquirer/prompts'
-import * as fs from 'fs'
 import * as path from 'path'
 import { ProjectInfo, UserAnswers, FirebaseWebConfig, BackendConfig } from '../types'
 import { logger } from '../utils/logger'
-import { FIREBASE_CONSOLE_URL, FIREBASE_MESSAGING_URL } from '../constants'
+import { writeFile, readFile, fileExists, appendToFile } from '../utils/fileUtils'
+import {
+  FIREBASE_CONSOLE_URL,
+  FIREBASE_MESSAGING_URL,
+  FIREBASE_SERVICE_ACCOUNT_URL,
+  VAPID_GENERATOR_URL,
+  GITIGNORE_FILENAME,
+} from '../constants'
 
 async function requiredInput(message: string): Promise<string> {
   let value = ''
   while (!value.trim()) {
     value = await input({ message })
     if (!value.trim()) {
-      logger.warn('This field is required. Please enter a value.')
+      logger.warn('  This field is required. Please enter a value.')
     }
   }
   return value.trim()
@@ -23,7 +29,7 @@ async function optionalInput(message: string): Promise<string> {
 
 export async function runPrompts(project: ProjectInfo, options: { backendOnly?: boolean } = {}): Promise<UserAnswers> {
   const { backendOnly = false } = options
-  
+
   let apiKey = ''
   let authDomain = ''
   let projectId = ''
@@ -37,12 +43,16 @@ export async function runPrompts(project: ProjectInfo, options: { backendOnly?: 
 
   if (backendOnly) {
     // ── Mode: Backend Only ──────────────────────────────────────────────
-    logger.info('Backend-only setup detected.')
-    
-    // 1. Credentials first (Service Account)
+    logger.info('ℹ  Backend-only setup detected.')
     logger.blank()
-    logger.info("Firebase Admin SDK requires a Service Account (credentials.json).")
-    logger.info(`Generate it here: ${FIREBASE_CONSOLE_URL} → Project Settings → Service Accounts`)
+
+    // 1. Credentials first (Service Account)
+    logger.info('Firebase Admin SDK requires a Service Account (credentials.json).')
+    logger.info('Generate it here:')
+    logger.info(`  1. Go to ${FIREBASE_CONSOLE_URL}`)
+    logger.info(`  2. Project Settings → Service Accounts → Generate new private key`)
+    logger.info(`  3. Download the JSON file and provide its path below.`)
+    logger.info(`  Direct link: ${FIREBASE_SERVICE_ACCOUNT_URL}`)
     logger.blank()
 
     const credInput = await input({
@@ -53,31 +63,43 @@ export async function runPrompts(project: ProjectInfo, options: { backendOnly?: 
     // 2. Optional Web Config (for service config if needed)
     logger.blank()
     const wantWebConfig = await confirm({
-      message: 'Do you also want to provide Firebase Web Config? (Usually not needed for backend-only)',
-      default: false
+      message: 'Also provide Firebase Web Config? (Usually not needed for backend-only)',
+      default: false,
     })
 
     if (wantWebConfig) {
+      logger.blank()
+      logger.info('Get your config from:')
+      logger.info('Firebase Console → Project Settings → Your apps → SDK setup and configuration')
+      logger.blank()
+
       apiKey = await requiredInput('API Key:')
       authDomain = await requiredInput('Auth Domain:')
       projectId = await requiredInput('Project ID:')
       storageBucket = await requiredInput('Storage Bucket:')
       messagingSenderId = await requiredInput('Messaging Sender ID:')
       appId = await requiredInput('App ID:')
-      vapidKey = await requiredInput('VAPID Key:')
+
+      logger.blank()
+      logger.info('VAPID Key (Web Push certificate):')
+      logger.info(`  Get it from: ${FIREBASE_MESSAGING_URL}`)
+      logger.info(`  Or generate one: ${VAPID_GENERATOR_URL}`)
+      logger.blank()
+      vapidKey = await requiredInput('Enter your VAPID key:')
     }
 
     // 3. URLs
     logger.blank()
-    logger.info('Backend configuration for token management:')
-    registerUrl = await optionalInput('Default token registration URL (e.g. http://localhost:3000/push/register):')
-    unregisterUrl = await optionalInput('Default token unregister URL (optional):')
+    logger.info('Backend endpoints for token management:')
+    registerUrl = await optionalInput('Token registration URL (e.g. http://localhost:3000/push/register):')
+    unregisterUrl = await optionalInput('Token unregister URL (optional — press Enter to skip):')
 
   } else {
     // ── Mode: Standard (Frontend + Optional Backend) ─────────────────────
     logger.blank()
     logger.info('Get your config from:')
-    logger.info('Firebase Console → Project Settings → Your apps → SDK setup and configuration')
+    logger.info(`  Firebase Console → Project Settings → Your apps → SDK setup and configuration`)
+    logger.info(`  Link: ${FIREBASE_CONSOLE_URL}`)
     logger.blank()
 
     apiKey = await requiredInput('API Key:')
@@ -88,19 +110,28 @@ export async function runPrompts(project: ProjectInfo, options: { backendOnly?: 
     appId = await requiredInput('App ID:')
 
     logger.blank()
-    logger.info('Get VAPID key: Firebase Console → Project Settings → Cloud Messaging → Web Push certificates')
-    logger.info(`Link: ${FIREBASE_MESSAGING_URL}`)
+    logger.info('VAPID Key (Web Push certificate):')
+    logger.info(`  Get it from: Firebase Console → Cloud Messaging → Web Push certificates`)
+    logger.info(`  Link: ${FIREBASE_MESSAGING_URL}`)
+    logger.info(`  Or generate outside Firebase: ${VAPID_GENERATOR_URL}`)
     logger.blank()
     vapidKey = await requiredInput('Enter your VAPID key:')
 
     if (project.scope === 'both') {
       logger.blank()
       logger.info('Backend configuration for token management:')
-      registerUrl = await requiredInput('Token registration URL:')
-      unregisterUrl = await optionalInput('Token unregister URL (optional):')
+      registerUrl = await requiredInput('Token registration URL (e.g. http://localhost:3000/push/register):')
+      unregisterUrl = await optionalInput('Token unregister URL (optional — press Enter to skip):')
 
       logger.blank()
-      logger.info("Service Account (for Admin SDK):")
+      logger.info('Service Account (for Firebase Admin SDK):')
+      logger.info(`  Don't have one? Generate it here:`)
+      logger.info(`  1. Go to ${FIREBASE_CONSOLE_URL}`)
+      logger.info(`  2. Project Settings → Service Accounts → Generate new private key`)
+      logger.info(`  3. Download the JSON file and paste its path below.`)
+      logger.info(`  Direct link: ${FIREBASE_SERVICE_ACCOUNT_URL}`)
+      logger.blank()
+      logger.info('  Press Enter to skip and add it manually to our_pkg.json later.')
       const credInput = await input({
         message: 'Path to your Firebase credentials.json:',
       })
@@ -126,111 +157,104 @@ export async function runPrompts(project: ProjectInfo, options: { backendOnly?: 
 
   // ── Environment Variables ───────────────────────────────────────────
   if (apiKey) {
-    const separator = '─'.repeat(46)
-    const envBlock = buildEnvBlock(firebase, separator)
-    console.log(envBlock)
+    const envPrefix = project.isVite ? 'VITE' : 'REACT_APP'
 
-    await input({ message: "Press Enter once you've added these values to your .env file..." })
+    logger.blank()
+    logger.divider()
+    logger.info('  Add these to your .env file:')
+    logger.divider()
+    logger.blank()
+    logger.raw(`  ${envPrefix}_FIREBASE_API_KEY=${firebase.apiKey}`)
+    logger.raw(`  ${envPrefix}_FIREBASE_AUTH_DOMAIN=${firebase.authDomain}`)
+    logger.raw(`  ${envPrefix}_FIREBASE_PROJECT_ID=${firebase.projectId}`)
+    logger.raw(`  ${envPrefix}_FIREBASE_STORAGE_BUCKET=${firebase.storageBucket}`)
+    logger.raw(`  ${envPrefix}_FIREBASE_MESSAGING_SENDER_ID=${firebase.messagingSenderId}`)
+    logger.raw(`  ${envPrefix}_FIREBASE_APP_ID=${firebase.appId}`)
+    logger.raw(`  ${envPrefix}_FIREBASE_VAPID_KEY=${firebase.vapidKey}`)
+    logger.blank()
+    logger.warn('  ⚠  Never commit .env to git. Add it to .gitignore.')
+    logger.divider()
+    logger.blank()
 
-    if (await confirm({ message: 'Save environment variables to .env file automatically?', default: true })) {
+    const saveEnv = await confirm({
+      message: 'Save environment variables to .env file automatically?',
+      default: true,
+    })
+
+    if (saveEnv) {
       try {
-        const envContent = buildEnvFileContent(firebase)
-        fs.writeFileSync(path.join(project.rootDir, '.env'), envContent + '\n', { flag: 'a' })
-        logger.success('Environment variables appended to .env file')
-      } catch {
-        logger.warn('Could not save .env file.')
+        const envContent = [
+          '# Firebase Configuration - Generated by CustomPush',
+          `${envPrefix}_FIREBASE_API_KEY=${firebase.apiKey}`,
+          `${envPrefix}_FIREBASE_AUTH_DOMAIN=${firebase.authDomain}`,
+          `${envPrefix}_FIREBASE_PROJECT_ID=${firebase.projectId}`,
+          `${envPrefix}_FIREBASE_STORAGE_BUCKET=${firebase.storageBucket}`,
+          `${envPrefix}_FIREBASE_MESSAGING_SENDER_ID=${firebase.messagingSenderId}`,
+          `${envPrefix}_FIREBASE_APP_ID=${firebase.appId}`,
+          `${envPrefix}_FIREBASE_VAPID_KEY=${firebase.vapidKey}`,
+          '',
+        ].join('\n')
+
+        const envPath = path.join(project.rootDir, '.env')
+        const envExists = await fileExists(envPath)
+
+        if (envExists) {
+          await appendToFile(envPath, envContent)
+          logger.success('✓  Environment variables appended to .env')
+        } else {
+          await writeFile(envPath, envContent)
+          logger.success('✓  .env file created with Firebase configuration')
+        }
+
+        // Ensure .env is in .gitignore
+        const gitignorePath = path.join(project.rootDir, GITIGNORE_FILENAME)
+        let gitignoreContent = ''
+        try {
+          gitignoreContent = await readFile(gitignorePath)
+        } catch {
+          // .gitignore doesn't exist yet — will be created by appendToFile
+        }
+        const gitignoreLines = gitignoreContent.split('\n').map(l => l.trim())
+        if (!gitignoreLines.includes('.env')) {
+          await appendToFile(gitignorePath, '.env')
+          logger.success('✓  .env added to .gitignore')
+        }
+      } catch (envErr: any) {
+        logger.warn(`⚠  Could not save .env file: ${envErr.message}`)
+        logger.info('   Add the environment variables manually.')
       }
     }
   }
 
-  // ── Usage & Guide ───────────────────────────────────────────────────
-  const separator = '─'.repeat(46)
+  // ── Usage guide ───────────────────────────────────────────────────────
   if (!backendOnly) {
-     const usageBlock = buildUsageBlock(separator, registerUrl || '/api/push/register')
-     console.log(usageBlock)
+    logger.blank()
+    logger.divider()
+    logger.info('  How to use custom-push in your app:')
+    logger.divider()
+    logger.blank()
+    logger.raw('  // 1. Wrap your app root:')
+    logger.raw("  import { CustomPushProvider } from 'custom-push'")
+    logger.blank()
+    logger.raw('  function App() {')
+    logger.raw('    return (')
+    logger.raw('      <CustomPushProvider config={pushConfig}>')
+    logger.raw('        <YourApp />')
+    logger.raw('      </CustomPushProvider>')
+    logger.raw('    )')
+    logger.raw('  }')
+    logger.blank()
+    logger.raw('  // 2. Use in any component:')
+    logger.raw("  import { usePushMessage } from 'custom-push'")
+    logger.raw('  const { requestPermission, messages } = usePushMessage()')
+    logger.blank()
+    logger.warn('  ⚠  Safari: requestPermission() must be called from a button click.')
+    logger.divider()
   }
-  
-  await saveUsageMd(project.srcDir, firebase, registerUrl || '/api/push/register', backendOnly)
 
   return {
     firebase,
     backendUrls,
     credentialsPath,
-  }
-}
-
-function buildEnvBlock(firebase: FirebaseWebConfig, separator: string): string {
-  return `
-${separator}
-  Add these to your .env file
-${separator}
-
-  REACT_APP_FIREBASE_API_KEY=${firebase.apiKey}
-  REACT_APP_FIREBASE_AUTH_DOMAIN=${firebase.authDomain}
-  REACT_APP_FIREBASE_PROJECT_ID=${firebase.projectId}
-  REACT_APP_FIREBASE_STORAGE_BUCKET=${firebase.storageBucket}
-  REACT_APP_FIREBASE_MESSAGING_SENDER_ID=${firebase.messagingSenderId}
-  REACT_APP_FIREBASE_APP_ID=${firebase.appId}
-  REACT_APP_FIREBASE_VAPID_KEY=${firebase.vapidKey}
-
-  ⚠  Never commit .env to git. Add it to .gitignore now.
-${separator}`
-}
-
-function buildEnvFileContent(firebase: FirebaseWebConfig): string {
-  return `# Firebase Configuration - Generated by CustomPush
-REACT_APP_FIREBASE_API_KEY=${firebase.apiKey}
-REACT_APP_FIREBASE_AUTH_DOMAIN=${firebase.authDomain}
-REACT_APP_FIREBASE_PROJECT_ID=${firebase.projectId}
-REACT_APP_FIREBASE_STORAGE_BUCKET=${firebase.storageBucket}
-REACT_APP_FIREBASE_MESSAGING_SENDER_ID=${firebase.messagingSenderId}
-REACT_APP_FIREBASE_APP_ID=${firebase.appId}
-REACT_APP_FIREBASE_VAPID_KEY=${firebase.vapidKey}
-`
-}
-
-function buildUsageBlock(separator: string, registerUrl: string): string {
-  return `
-${separator}
-  How to use custom-push in your app
-${separator}
-
-  // 1. Wrap your app root:
-  import { CustomPushProvider } from 'custom-push'
-  import { pushConfig } from './pushConfig'
-
-  function App() {
-    return (
-      <CustomPushProvider config={pushConfig}>
-        <YourApp />
-      </CustomPushProvider>
-    )
-  }
-
-  // 2. Use in any component:
-  import { usePushMessage } from 'custom-push'
-  const { sendMessage } = usePushMessage()
-${separator}`
-}
-
-async function saveUsageMd(srcDir: string, firebase: FirebaseWebConfig, registerUrl: string, backendOnly: boolean): Promise<void> {
-  const pushDir = path.join(srcDir, 'push')
-  const usagePath = path.join(pushDir, 'USAGE.md')
-
-  try {
-    if (!fs.existsSync(pushDir)) fs.mkdirSync(pushDir, { recursive: true })
-
-    let content = `# custom-push Usage Guide\n\n`
-    
-    if (!backendOnly && firebase.apiKey) {
-      content += `## Frontend Setup\nAdd environment variables to your .env file and wrap your app in \`<CustomPushProvider />\`.\n\n`
-    }
-    
-    content += `## Backend Usage\nUse the generated \`sendPushNotification\` helper to push messages from your server.\n`
-
-    fs.writeFileSync(usagePath, content, 'utf8')
-    logger.success(`Usage guide saved to src/push/USAGE.md`)
-  } catch {
-    logger.warn('Could not write USAGE.md')
   }
 }

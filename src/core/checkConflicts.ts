@@ -24,13 +24,13 @@ export async function checkConflicts(
     let resolved = false
     while (!resolved) {
       logger.blank()
-      logger.warn(`conflict  ${relativePath}`)
+      logger.warn(`  conflict  ${relativePath}`)
 
       const choice = await select<ConflictResolution>({
         message: 'What do you want to do?',
         choices: [
-          { name: 'Overwrite   — replace existing file', value: 'overwrite' as ConflictResolution },
-          { name: 'Skip        — keep existing file', value: 'skip' as ConflictResolution },
+          { name: 'Overwrite   — replace with new file', value: 'overwrite' as ConflictResolution },
+          { name: 'Skip        — keep existing file unchanged', value: 'skip' as ConflictResolution },
           { name: 'View        — show current file content', value: 'view' as ConflictResolution },
           { name: 'Diff        — show what would change', value: 'diff' as ConflictResolution },
         ],
@@ -43,18 +43,27 @@ export async function checkConflicts(
         results.push({ ...file, action: 'skip' })
         resolved = true
       } else if (choice === 'view') {
-        const currentContent = await readFile(file.path)
-        logger.blank()
-        logger.info(`── Current content of ${relativePath} ──`)
-        logger.raw(currentContent)
-        logger.divider()
+        try {
+          const currentContent = await readFile(file.path)
+          logger.blank()
+          logger.info(`── Current content of ${relativePath} ──`)
+          logger.raw(currentContent)
+          logger.divider()
+        } catch (viewErr: any) {
+          logger.error(`✖  Could not read file: ${viewErr.message}`)
+          // Continue the loop so user can pick a different option
+        }
       } else if (choice === 'diff') {
-        const currentContent = await readFile(file.path)
-        const diffOutput = getDiff(currentContent, file.content)
-        logger.blank()
-        logger.info(`── Diff for ${relativePath} ──`)
-        logger.raw(diffOutput)
-        logger.divider()
+        try {
+          const currentContent = await readFile(file.path)
+          const diffOutput = getDiff(currentContent, file.content)
+          logger.blank()
+          logger.info(`── Diff for ${relativePath} ──`)
+          logger.raw(diffOutput)
+          logger.divider()
+        } catch (diffErr: any) {
+          logger.error(`✖  Could not generate diff: ${diffErr.message}`)
+        }
       }
     }
   }

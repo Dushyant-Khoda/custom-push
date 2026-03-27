@@ -9,10 +9,11 @@ program
   .description('CustomPush - Firebase push notifications setup tool')
   .version(packageJson.version)
 
-// Main init command - backend focused by default
+// Main init command
 program
   .command('init')
-  .description('Initialize push notifications (backend scaffolding + optional frontend)')
+  .description('Initialize push notifications in your project')
+  .option('--files', 'Generate standalone files instead of using the npm library')
   .option('--generate-frontend', 'Generate frontend boilerplate files')
   .option('--backend-only', 'Skip frontend completely, backend only')
   .action(async (options) => {
@@ -28,7 +29,7 @@ program
         process.exit(0)
       } else {
         showError('Setup Failed', error.message || 'Unknown error occurred', 'Check troubleshooting guide for help')
-        footer('Need help? https://github.com/your-username/custom-push/issues')
+        footer('Need help? https://github.com/Dushyant-Khoda/custom-push/issues')
         process.exit(1)
       }
     }
@@ -59,9 +60,9 @@ program
   })
 
 // Handle uncaught promise rejections
-process.on('unhandledRejection', (reason, promise) => {
+process.on('unhandledRejection', (reason) => {
   showError('Unexpected Error', reason instanceof Error ? reason.message : String(reason), 'Please report this issue to help us improve')
-  footer('Report: https://github.com/your-username/custom-push/issues')
+  footer('Report: https://github.com/Dushyant-Khoda/custom-push/issues')
   process.exit(1)
 })
 

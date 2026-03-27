@@ -9,20 +9,20 @@ export async function generateConfig(context: CLIContext): Promise<void> {
   const { project, answers } = context
 
   // Read CLI package.json for customPushVersion
-  let customPushVersion = '1.0.0'
+  let customPushVersion = '1.1.0'
   try {
     const cliPkg = await readJson<Record<string, any>>(path.join(PACKAGE_ROOT, 'package.json'))
-    customPushVersion = cliPkg.version || '1.0.0'
+    customPushVersion = cliPkg.version || '1.1.0'
   } catch {
-    // fallback to 1.0.0
+    // fallback
   }
 
   const now = new Date().toISOString()
 
   // Build relative credentials path
   let relativeCredentialsPath: string | null = null
-  if (answers.credentialsPath) {
-    relativeCredentialsPath = './' + path.relative(project.rootDir, answers.credentialsPath)
+  if (answers.backendUrls.credentialsPath) {
+    relativeCredentialsPath = './' + path.relative(project.rootDir, answers.backendUrls.credentialsPath)
   }
 
   const config = {
@@ -33,6 +33,8 @@ export async function generateConfig(context: CLIContext): Promise<void> {
       language: project.language,
       scope: project.scope,
       backendFramework: project.backendFramework,
+      isNextJs: project.isNextJs,
+      isVite: project.isVite,
     },
     firebase: {
       apiKey: answers.firebase.apiKey,
@@ -48,8 +50,14 @@ export async function generateConfig(context: CLIContext): Promise<void> {
       unregisterUrl: answers.backendUrls.unregisterUrl,
       credentialsPath: relativeCredentialsPath,
     },
+    notification: {
+      defaultIcon: '/icon.png',
+      defaultBadge: '/badge.png',
+      defaultTitle: answers.firebase.projectId || 'Notification',
+      clickAction: '/',
+    },
     serviceWorker: {
-      path: '/firebase-messaging-sw.js',
+      path: `/${context.serviceWorkerFilename}`,
       generatedAt: now,
     },
     compatibility: {
@@ -71,7 +79,7 @@ export async function generateConfig(context: CLIContext): Promise<void> {
 
   for (const file of resolved) {
     if (file.action === 'skip') {
-      logger.info(`Kept existing ${CONFIG_FILENAME}`)
+      logger.info(`ℹ  Kept existing ${CONFIG_FILENAME}`)
       context.scaffolded.push({
         absolutePath: filePath,
         relativePath: CONFIG_FILENAME,
@@ -79,13 +87,17 @@ export async function generateConfig(context: CLIContext): Promise<void> {
         description: 'Kept existing file',
       })
     } else {
-      await writeJson(filePath, config)
-      context.scaffolded.push({
-        absolutePath: filePath,
-        relativePath: CONFIG_FILENAME,
-        status: 'created',
-        description: 'custom-push configuration',
-      })
+      try {
+        await writeJson(filePath, config)
+        context.scaffolded.push({
+          absolutePath: filePath,
+          relativePath: CONFIG_FILENAME,
+          status: 'created',
+          description: 'custom-push configuration',
+        })
+      } catch (writeErr: any) {
+        logger.error(`✖  Failed to write ${CONFIG_FILENAME}: ${writeErr.message}`)
+      }
     }
   }
 }

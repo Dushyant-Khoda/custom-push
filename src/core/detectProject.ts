@@ -9,7 +9,7 @@ export async function detectProject(cwd: string): Promise<ProjectInfo> {
   // ── package.json ──────────────────────────────────────────────────────
   const pkgPath = path.join(rootDir, 'package.json')
   if (!(await fileExists(pkgPath))) {
-    logger.error('No package.json found. Run custom-push init from your project root.')
+    logger.error('✖  No package.json found. Run custom-push init from your project root.')
     process.exit(1)
   }
   const packageJson = await readJson<Record<string, any>>(pkgPath)
@@ -28,6 +28,15 @@ export async function detectProject(cwd: string): Promise<ProjectInfo> {
   const rawFirebase: string | undefined = deps['firebase']
   const firebaseVersion = rawFirebase ? rawFirebase.replace(/[\^~]/g, '') : null
   const hasFirebase = firebaseVersion !== null
+
+  // ── framework detection ───────────────────────────────────────────────
+  const isNextJs = !!(deps['next'] || devDeps['next'])
+  const isVite = !!(
+    devDeps['vite'] ||
+    deps['vite'] ||
+    await fileExists(path.join(rootDir, 'vite.config.ts')) ||
+    await fileExists(path.join(rootDir, 'vite.config.js'))
+  )
 
   // ── backend framework ─────────────────────────────────────────────────
   let backendFramework: BackendFramework = null
@@ -48,7 +57,7 @@ export async function detectProject(cwd: string): Promise<ProjectInfo> {
   const publicCandidate = path.join(rootDir, 'public')
   if (!(await fileExists(publicCandidate))) {
     await ensureDir(publicCandidate)
-    logger.info('No /public directory found. Created it.')
+    logger.info('ℹ  No /public directory found. Created it.')
   }
   const publicDir = publicCandidate
 
@@ -63,6 +72,8 @@ export async function detectProject(cwd: string): Promise<ProjectInfo> {
     backendFramework,
     scope,
     hasTsConfig,
+    isNextJs,
+    isVite,
     packageJson,
   }
 }
