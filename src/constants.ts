@@ -1,10 +1,9 @@
 import * as path from 'path'
 
 // ── Package paths ───────────────────────────────────────────────────────────
-// In production (npm install), __dirname is dist/
-// Templates are shipped in src/templates via "files" in package.json
+// Templates are shipped in root templates/ via "files" in package.json
 export const PACKAGE_ROOT = path.resolve(__dirname, '..')
-export const TEMPLATES_DIR = path.join(PACKAGE_ROOT, 'src', 'templates')
+export const TEMPLATES_DIR = path.join(PACKAGE_ROOT, 'templates')
 
 // ── Version compatibility ranges ────────────────────────────────────────────
 export const FIREBASE_VERSION_RANGE = '>=10.0.0 <13.0.0'

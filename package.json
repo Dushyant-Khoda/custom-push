@@ -1,6 +1,6 @@
 {
   "name": "custom-push",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "All-in-one push notification package — npm library + CLI scaffolder with Safari support",
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
@@ -17,7 +17,7 @@
   "files": [
     "bin",
     "dist",
-    "src/templates"
+    "templates"
   ],
   "scripts": {
     "build": "tsc",
