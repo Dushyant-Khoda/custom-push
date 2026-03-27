@@ -1,6 +1,6 @@
 # API Reference
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [CLI Commands](#cli-commands)
 - [Configuration](#configuration)
@@ -9,7 +9,7 @@
 - [Types](#types)
 - [Events](#events)
 
-## 🎯 CLI Commands
+##  CLI Commands
 
 ### `custom-push init`
 
@@ -43,7 +43,7 @@ npx custom-push init [options]
 | 1 | Error (missing package.json, invalid input, etc.) |
 | 2 | User cancelled |
 
-## ⚙️ Configuration
+## Configuration
 
 ### `our_pkg.json`
 
@@ -99,172 +99,146 @@ interface OurPackageJson {
 | `NODE_ENV` | Environment mode | `development` |
 | `FIREBASE_CONFIG` | Override Firebase config | `undefined` |
 
-## 🎨 Frontend API
+## Frontend API (React Package)
 
-### `usePush()`
+### `CustomPushProvider`
 
-Main React hook for initializing push notifications.
-
-```typescript
-import { usePush } from './push/pushHelper'
-
-interface UsePushOptions {
-  onMessage?: (payload: MessagePayload) => void
-  onReady?: (token: string) => void
-  onPermissionDenied?: () => void
-  onError?: (error: Error) => void
-}
-
-function usePush(options?: UsePushOptions): void
-```
-
-#### Usage
+The root component that handles Firebase initialization, token management, and Safari-specific permission logic.
 
 ```typescript
-import { usePush } from './push/pushHelper'
+import { CustomPushProvider } from 'custom-push';
+
+const pushConfig = {
+  apiKey: "your-api-key",
+  authDomain: "your-project.firebaseapp.com",
+  projectId: "your-project-id",
+  storageBucket: "your-project.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:1:web:abcdef",
+  vapidKey: "your-vapid-key",
+  registerUrl: "/push/register" // Optional: Your backend register endpoint
+};
 
 function App() {
-  usePush({
-    onMessage: (payload) => {
-      console.log('Foreground message:', payload)
-      // Show toast notification
-      toast(`${payload.notification?.title}: ${payload.notification?.body}`)
-    },
-    onReady: (token) => {
-      console.log('FCM token:', token)
-      // Send token to your backend
-      registerToken(token)
-    },
-    onPermissionDenied: () => {
-      console.warn('Notification permission denied')
-      // Show UI to request permission
-    },
-    onError: (error) => {
-      console.error('Push error:', error)
-      // Show error message to user
-    }
-  })
-  
-  return <YourApp />
+  return (
+    <CustomPushProvider config={pushConfig}>
+      <YourAppContents />
+    </CustomPushProvider>
+  );
 }
 ```
 
-### Message Payload
+#### Props
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `config` | `PushConfig` | (Required) Your Firebase config and VAPID key. |
+| `onToast` | `(message: PushMessage) => void` | (Optional) Callback triggered when a message arrives while the tab is active. Use this for in-app notifications. |
+
+### `usePushMessage()`
+
+The primary hook for accessing push notification state and functionality. Must be used within a `<CustomPushProvider>`.
 
 ```typescript
-interface MessagePayload {
-  notification?: {
-    title?: string
-    body?: string
-    icon?: string
-    badge?: string
-    image?: string
-  }
-  data?: Record<string, string>
-  from?: string
-  messageId?: string
-  collapseKey?: string
+const { 
+  token, 
+  messages, 
+  requestPermission, 
+  sendMessage, 
+  isSupported 
+} = usePushMessage();
+```
+
+#### Returned Values
+
+| Value | Type | Description |
+|-------|------|-------------|
+| `token` | `string \| null` | The current FCM token, or `null` if not granted. |
+| `messages` | `PushMessage[]` | Array of messages received in the current session. |
+| `requestPermission` | `() => Promise<boolean>` | (Critical) Requests permission. **Must be called from a user gesture (button click)** for Safari support. |
+| `sendMessage` | `(title: string, body: string, data?: object) => Promise<void>` | Sends a test notification via your backend `registerUrl`. |
+| `isSupported` | `boolean` | Whether the current browser supports Web Push. |
+| `isPermissionGranted` | `boolean` | Current status of browser notification permissions. |
+| `isTabActive` | `boolean` | Whether the browser tab is currently focused. |
+
+---
+
+### Message Structure
+
+```typescript
+interface PushMessage {
+  id: string;             // Unique identifier
+  title: string;          // Notification header
+  body: string;           // Notification content
+  icon?: string;          // Icon URL
+  url?: string;           // Target link (click action)
+  data?: Record<string, string>; // Raw custom data
+  timestamp: number;      // Epoch time
 }
 ```
 
-## 🔧 Backend API
+## Backend API (FCM Engine)
 
-### Express Routes
+### `FCMHelper`
 
-Generated Express routes for token management.
+The CLI generates a production-ready `FCMHelper.js` (or `.ts`) in your `src/helper/` directory. This engine is pre-configured with your service account and the Firebase Admin SDK.
 
-#### POST `/push/register`
+#### `sendPushNotification(params)`
 
-Registers a device token for push notifications.
-
-```typescript
-interface RegisterRequest {
-  token: string
-  userId?: string  // Add via auth middleware
-}
-
-interface RegisterResponse {
-  success: boolean
-  error?: string
-}
-```
-
-#### POST `/push/unregister`
-
-Removes a device token.
+The primary method for sending notifications to specific device tokens.
 
 ```typescript
-interface UnregisterRequest {
-  token: string
+import { sendPushNotification } from './helper/FCMHelper';
+
+interface PushNotificationParams {
+  token: string;          // Recipient's FCM token
+  title: string;          // Notification header
+  body: string;           // Notification message
+  data?: Record<string, string>; // Custom data payload
+  route?: string;         // Navigation path (handled by SW)
+  icon?: string;          // Custom icon URL
+  badge?: string;         // Status bar badge icon URL
 }
 
-interface UnregisterResponse {
-  success: boolean
-  error?: string
-}
-```
-
-### NestJS Module
-
-Generated NestJS module with service and controller.
-
-#### PushService
-
-```typescript
-@Injectable()
-export class PushService {
-  // Register device token
-  async registerToken(userId: string, token: string): Promise<void>
-  
-  // Unregister device token  
-  async unregisterToken(token: string): Promise<void>
-  
-  // Send push notification
-  async sendNotification(params: SendNotificationParams): Promise<string>
-}
-```
-
-#### PushController
-
-```typescript
-@Controller('push')
-export class PushController {
-  @Post('register')
-  async register(@Body() body: RegisterTokenDto): Promise<RegisterResponse>
-  
-  @Post('unregister') 
-  async unregister(@Body() body: UnregisterTokenDto): Promise<UnregisterResponse>
-}
-```
-
-### Send Push Notification
-
-Common interface for sending notifications (both Express and NestJS).
-
-```typescript
-interface SendNotificationParams {
-  token: string
-  title: string
-  body: string
-  data?: Record<string, string>
-  route?: string
-  icon?: string
-  badge?: string
-}
-
-// Usage
+// Example: Sending a rich notification
 await sendPushNotification({
-  token: 'device-fcm-token',
-  title: 'New Message',
-  body: 'You have a new message from John',
-  data: { messageId: '123', type: 'message' },
-  route: '/messages/123',
-  icon: '/icon.png',
-  badge: '/badge.png'
-})
+  token: 'fcm-token-xyz',
+  title: 'New Workspace Invite',
+  body: 'You have been invited to join the "Design" team.',
+  route: '/invites/123',
+  icon: '/icons/invite-192x192.png',
+  data: {
+    inviteId: '123',
+    type: 'collaboration'
+  }
+});
 ```
 
-## 📝 Types
+#### Best Practices & Icon Standards
+
+- **Icon Size**: For optimal display on Android and Desktop, use a **192x192px** PNG or JPG.
+- **Badge Content**: Badges should ideally be monochrome and transparent for the status bar.
+- **Payload Limits**: Keep the `data` payload under **4KB** to ensure delivery across all network conditions.
+- **Route Handling**: The generated Service Worker automatically listens for the `route` key and navigates the user to that path upon clicking the notification.
+
+### Framework Integration
+
+#### Express
+Mount the logic using traditional routes or call `sendPushNotification` anywhere in your controllers.
+
+#### NestJS
+The CLI generates a `PushModule` with an injectable `PushService`.
+
+```typescript
+// Anywhere in your NestJS app
+constructor(private readonly pushService: PushService) {}
+
+async notify() {
+  await this.pushService.sendNotification({ ... });
+}
+```
+
+## Types
 
 ### Project Types
 
@@ -324,7 +298,7 @@ export interface CLIContext {
 }
 ```
 
-## 🎪 Events
+## Events
 
 ### Frontend Events
 
@@ -391,7 +365,7 @@ Handles background push messages.
 #### `notificationclose`
 Handles notification close events.
 
-## 🔧 Utility Functions
+## Utility Functions
 
 ### Template Engine
 
@@ -435,7 +409,7 @@ await appendToFile(filePath: string, line: string): Promise<void>
 await ensureDir(dirPath: string): Promise<void>
 ```
 
-## 🚨 Error Handling
+## Error Handling
 
 ### Common Errors
 
@@ -465,6 +439,6 @@ interface ScaffoldedFile {
 }
 ```
 
-## 📚 Examples
+## Examples
 
 See [EXAMPLES.md](./EXAMPLES.md) for complete code examples and patterns.

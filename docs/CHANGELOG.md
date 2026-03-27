@@ -5,23 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2] - 2026-03-27
+
+### Added
+- **Professional Backend-Only Mode**: A dedicated, zero-fluff setup flow specifically for server-side push engines.
+- **New Backend Structure**: Helpers now target `src/helper/` (instead of `src/push/`) for cleaner organization in backend-only projects.
+- **FCMHelper Standard**: Renamed backend helpers to `FCMHelper.js/ts` with rich JSDoc/TSDoc for an elite developer experience.
+-  **Smart Conflict Resolution**: Implemented date-based naming (e.g., `FCMHelper-27-03.js`) for existing helpers to preserve version history without CLI noise.
+- **Dependency Guard**: Added proactive checks for `firebase-admin` in `package.json` with clear installation warnings.
+- 📖 **Premium Templates**: Backend templates now include "Quick Start" samples with static test data and icon size recommendations (192x192px).
+
+### Fixed
+- **Branding Cleanup**: Eliminated duplicate branding headers in `init` and `generate-sw` commands for a single, professional welcome experience.
+- **Logic Refinement**: Corrected a validation bug where backend-only mode was skipping mandatory dependency checks.
+
 ## [1.0.0] - 2024-03-26
 
 ### Added
-- 🎉 Initial release of custom-push CLI
-- ✨ Smart project detection (TypeScript/JavaScript, React, Express/NestJS)
-- 📝 Interactive prompts with maximum 4 questions
-- ⚡ Version validation for Firebase and React compatibility
-- 🔄 Conflict resolution UI (overwrite/skip/view/diff)
-- 🎯 Backend scaffolding for Express and NestJS
-- 📦 Complete frontend integration with service worker
-- 🛡️ Full TypeScript support with generated interfaces
-- 🔧 Configuration management via `our_pkg.json`
-- 📱 Firebase Cloud Messaging integration
-- 🔐 VAPID key setup and management
-- 🎨 Colored terminal output with progress indicators
-- 📚 Comprehensive documentation and examples
-- 🧪 Production-ready code with no TODOs
+- Initial release of custom-push CLI
+- Smart project detection (TypeScript/JavaScript, React, Express/NestJS)
+- Interactive prompts with maximum 4 questions
+- Version validation for Firebase and React compatibility
+-  Conflict resolution UI (overwrite/skip/view/diff)
+-  Backend scaffolding for Express and NestJS
+-  Complete frontend integration with service worker
+- Full TypeScript support with generated interfaces
+- Configuration management via `our_pkg.json`
+- Firebase Cloud Messaging integration
+- VAPID key setup and management
+- Colored terminal output with progress indicators
+- Comprehensive documentation and examples
+- Production-ready code with no TODOs
 
 ### Features
 - **Auto-detection System**
@@ -102,25 +116,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Upcoming Features]
 
 ### Planned for v1.1.0
-- 🔍 Advanced project detection (Next.js, Remix, etc.)
-- 🎨 Custom notification UI components
-- 📊 Analytics and usage tracking
-- 🔄 Push notification scheduling
-- 🌐 Multi-language support
+- Advanced project detection (Next.js, Remix, etc.)
+- Custom notification UI components
+- Analytics and usage tracking
+-  Push notification scheduling
+- Multi-language support
 
 ### Planned for v1.2.0
-- 📱 Mobile app support (React Native)
-- 🔔 Advanced notification patterns
-- 📈 Performance monitoring
-- 🎯 A/B testing for notifications
+- Mobile app support (React Native)
+- Advanced notification patterns
+- Performance monitoring
+-  A/B testing for notifications
 - 📧 Email notification fallback
 
 ### Planned for v2.0.0
-- 🚀 Plugin system for custom providers
-- 🎨 Visual configuration interface
-- 📊 Advanced analytics dashboard
-- 🔗 Third-party integrations
-- 🌍 CDN distribution
+- Plugin system for custom providers
+- Visual configuration interface
+- Advanced analytics dashboard
+- Third-party integrations
+- CDN distribution
 
 ---
 

@@ -10,7 +10,7 @@ const ourPkg = require('../our_pkg.json');
  * This service provides a robust interface for sending push notifications 
  * using the Firebase Admin SDK.
  * 
- * 🚀 QUICK START (Test with static data):
+ * QUICK START (Test with static data):
  * 
  * // Inject PushService into your component/service
  * // constructor(private readonly pushService: PushService) {}
@@ -59,7 +59,7 @@ export class PushService implements OnModuleInit {
   /**
    * Sends a push notification to a specific device.
    * 
-   * 💡 BEST PRACTICES:
+   * BEST PRACTICES:
    * - Icons: Recommended size is 192x192px (PNG).
    * - Payload: Keep 'data' keys small to avoid truncation (4KB limit).
    * - VAPID: Ensure your VAPID key is correctly configured in Firebase for Safari support.

@@ -1,6 +1,6 @@
 # Troubleshooting Guide
 
-## 🚨 Common Issues and Solutions
+## Common Issues and Solutions
 
 ### Installation Issues
 
@@ -405,7 +405,7 @@ If you're still stuck:
    - Stack Overflow with `custom-push` tag
    - Firebase documentation
 
-## 🔧 Advanced Troubleshooting
+## Advanced Troubleshooting
 
 ### Network Issues
 

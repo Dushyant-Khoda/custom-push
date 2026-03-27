@@ -1,6 +1,6 @@
 # Frequently Asked Questions
 
-## 🤔 General Questions
+## General Questions
 
 ### What is custom-push?
 **custom-push** is a CLI tool that sets up Firebase Cloud Messaging push notifications in React projects with a single command. It handles all the complex setup including service workers, token management, and backend integration.
@@ -18,7 +18,7 @@ No! The CLI guides you through getting your Firebase configuration and handles a
 2. Copy the configuration values
 3. Run the CLI
 
-## 🛠️ Installation & Setup
+## Installation & Setup
 
 ### Do I need to install anything?
 No installation required! Use it directly with:
@@ -46,7 +46,7 @@ Yes! The CLI is designed to work with any React project:
 - Custom webpack setups
 - TypeScript or JavaScript
 
-## 🔧 Configuration
+## Configuration
 
 ### Where is the configuration stored?
 All configuration is stored in `our_pkg.json` in your project root. This file contains:
@@ -76,7 +76,7 @@ Edit `our_pkg.json`:
 }
 ```
 
-## 🌐 Browser & Permissions
+## Browser & Permissions
 
 ### Do users need to grant permission?
 Yes, users must grant notification permission. The CLI handles this with a graceful fallback:
@@ -105,7 +105,7 @@ Yes, for production:
 ### What about mobile browsers?
 Yes! Progressive Web Apps (PWAs) on mobile devices support push notifications through the same implementation.
 
-## 🔙 Backend Integration
+## Backend Integration
 
 ### Do I need a backend?
 Not necessarily! You can:
@@ -133,7 +133,7 @@ Yes, for backend features like:
 
 The CLI scaffolds this for you automatically.
 
-## 📱 Notification Features
+## Notification Features
 
 ### Can I send notifications with images?
 Yes! Include an `icon` or `image` field:
@@ -170,7 +170,7 @@ Not directly through the CLI, but you can:
 - Implement scheduling in your backend
 - Use cron jobs with your backend
 
-## 🔒 Security & Privacy
+## Security & Privacy
 
 ### Is my Firebase config secure?
 The web config (API keys, etc.) is public by design and safe to expose. The sensitive credentials (service account) should never be exposed to the frontend.
@@ -191,7 +191,7 @@ You're responsible for:
 - Handling data requests
 - Complying with relevant regulations
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### "No package.json found"
 Make sure you're running the command from your React project root directory where `package.json` is located.
@@ -217,7 +217,7 @@ Check:
 - CORS is configured correctly
 - Firebase Admin SDK is properly initialized
 
-## 📈 Scaling & Performance
+## Scaling & Performance
 
 ### Can this handle many users?
 Yes! The implementation uses:
@@ -238,7 +238,7 @@ Use:
 - Browser developer tools
 - Custom logging in the generated helpers
 
-## 🔄 Updates & Maintenance
+##  Updates & Maintenance
 
 ### How do I update the setup?
 Run the CLI again:
@@ -261,7 +261,7 @@ npm install firebase@latest
 ### What about React updates?
 The generated code is framework-agnostic and should work with React updates. Test thoroughly after major React version changes.
 
-## 🤝 Contributing & Support
+## Contributing & Support
 
 ### How can I contribute?
 - Report bugs on GitHub
@@ -278,7 +278,7 @@ The generated code is framework-agnostic and should work with React updates. Tes
 ### Is this officially supported by Firebase?
 No, this is a community tool. Firebase support is handled through official Firebase channels.
 
-## 📄 Licensing
+## Licensing
 
 ### Can I use this in commercial projects?
 Yes! This is MIT licensed. You can use it in personal and commercial projects.
@@ -289,7 +289,7 @@ No attribution required, but appreciated!
 ### Can I modify the generated code?
 Yes! The generated code is yours to modify as needed.
 
-## 🔮 Future Features
+## Future Features
 
 ### What's planned for future versions?
 - More backend framework support
@@ -308,7 +308,7 @@ Check the GitHub repository for release schedules and roadmaps.
 
 ---
 
-## 📞 Still Need Help?
+## Still Need Help?
 
 If you couldn't find your answer here:
 

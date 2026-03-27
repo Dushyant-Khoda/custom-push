@@ -1,6 +1,6 @@
 # Installation Guide
 
-## 📦 Installation Options
+##  Installation Options
 
 ### Option 1: npx (Recommended)
 No installation required - runs directly from npm:
@@ -25,7 +25,7 @@ npm install --save-dev custom-push
 npx custom-push init
 ```
 
-## 🔧 System Requirements
+## System Requirements
 
 ### Required
 - **Node.js**: >= 18.0.0
@@ -35,42 +35,28 @@ npx custom-push init
 ### Optional (for backend features)
 - **Express**: >= 4.0.0
 - **NestJS**: >= 9.0.0
-- **Firebase Admin SDK**: >= 11.0.0
+- **Firebase Admin SDK**: >= 12.0.0 (Mandatory for backend)
 
-## 🚀 Quick Setup
+## Quick Setup
 
-### 1. Prepare Your React Project
-Ensure you have a React project with package.json:
+### 1. Professional Backend-Only Setup (Zero Fluff)
+If you only need a notification engine for your server:
 
 ```bash
-# Create new React project (if needed)
-npx create-react-app my-app
-cd my-app
-
-# Or use existing project
-cd your-react-project
+npx custom-push init --backend-only
 ```
+- **Detection**: Checks for `firebase-admin` in your `package.json`.
+- **Naming**: Generates `FCMHelper.js/ts` in `src/helper/`.
+- **Conflicts**: Smart date-based suffixes (e.g., `FCMHelper-27-03.js`) if already exists.
 
-### 2. Get Firebase Configuration
-1. Go to [Firebase Console](https://console.firebase.google.com)
-2. Create new project or select existing
-3. Add Web App to your project
-4. Copy Firebase config from Project Settings → Your apps → SDK setup
+### 2. Standard Full Setup
+For projects requiring both frontend and backend integration:
 
-### 3. Generate VAPID Key
-1. In Firebase Console → Project Settings → Cloud Messaging
-2. Go to "Web Push certificates"  
-3. Generate new key pair
-4. Copy the VAPID key
-
-### 4. Run the CLI
 ```bash
 npx custom-push init
 ```
 
-The CLI will guide you through the setup process.
-
-## 📋 Firebase Setup Instructions
+## Firebase Setup Instructions
 
 ### Step 1: Create Firebase Project
 1. Visit [Firebase Console](https://console.firebase.google.com)
@@ -100,27 +86,24 @@ For backend features, you'll need a service account:
 3. Download the JSON file
 4. Keep it secure - never commit to git
 
-## 🔍 Project Detection
+## Project Detection
 
 The CLI automatically detects:
 
 ### Frontend Stack
-- **TypeScript**: Checks for `tsconfig.json`
-- **JavaScript**: Default if no TypeScript config
-- **React**: Reads version from `package.json` dependencies
-- **Firebase**: Checks if already installed
+- **TypeScript**: Checks for `tsconfig.json`.
+- **React**: Reads version from `package.json`.
+- **Firebase**: Validates client SDK version.
 
 ### Backend Stack
-- **NestJS**: Detects `@nestjs/core` in dependencies
-- **Express**: Detects `express` in dependencies
-- **Priority**: NestJS takes priority over Express if both present
+- **Firebase Admin**: Checks for `firebase-admin` dependency.
+- **Frameworks**: Detects NestJS (`@nestjs/core`) or Express.
 
 ### Project Structure
-- **src/ directory**: Uses if exists, otherwise uses root
-- **public/ directory**: Creates if missing for service worker
-- **Root directory**: Current working directory (where package.json is)
+- **src/ directory**: Targets `src/helper/` for backend-only.
+- **public/ directory**: Skipped in backend-only; created for frontend SW.
 
-## ⚙️ Environment Setup
+## Environment Setup
 
 ### Development Environment
 ```bash
@@ -146,7 +129,7 @@ npm run build
 npx custom-push init
 ```
 
-## 🔧 Troubleshooting Installation
+## Troubleshooting Installation
 
 ### Common Issues
 
@@ -213,7 +196,7 @@ npm config set https-proxy http://proxy.company.com:8080
 https_proxy=http://proxy.company.com:8080 npx custom-push init
 ```
 
-## 📱 IDE Integration
+## IDE Integration
 
 ### VS Code
 Add to `.vscode/settings.json`:
@@ -231,7 +214,7 @@ Add to `.vscode/settings.json`:
 2. Enable TypeScript Compiler
 3. Add `node_modules` to excluded directories
 
-## 🚀 Verify Installation
+## Verify Installation
 
 ### Test CLI Works
 ```bash
@@ -261,7 +244,7 @@ function App() {
 }
 ```
 
-## 📚 Next Steps
+## Next Steps
 
 After successful installation:
 
@@ -270,7 +253,7 @@ After successful installation:
 3. **Review the troubleshooting guide** for common issues
 4. **Explore examples** for different use cases
 
-## 🔗 Related Documentation
+## Related Documentation
 
 - [Main README](./README.md) - Full usage guide
 - [API Reference](./API.md) - Detailed API documentation  

@@ -1,10 +1,10 @@
 # Architecture Overview
 
-## 🎯 New Architecture: Backend-Focused with Package-based Frontend
+##  New Architecture: Backend-Focused with Package-based Frontend
 
 The custom-push CLI has evolved to focus on backend scaffolding while the frontend is handled by the `custom-push` npm package.
 
-## 📦 Components
+##  Components
 
 ### 1. CLI Tool (`custom-push`)
 **Purpose**: Backend scaffolding and configuration generation
@@ -64,7 +64,7 @@ function App() {
 - ✅ Error handling
 - ✅ TypeScript support
 
-## 🔄 Workflow Comparison
+##  Workflow Comparison
 
 ### Old Workflow (CLI generates everything)
 ```bash
@@ -92,7 +92,7 @@ npx custom-push init --generate-frontend
 # → For users who prefer generated files
 ```
 
-## 🏗️ Architecture Benefits
+## Architecture Benefits
 
 ### 1. **Simplified Maintenance**
 - Frontend logic centralized in one package
@@ -114,25 +114,29 @@ npx custom-push init --generate-frontend
 - Generate boilerplate only when needed
 - Supports both workflows
 
-## 📁 File Structure
+## File Structure
 
 ### CLI Generated Files
 ```
 your-project/
-├── our_pkg.json                    # Configuration
-├── credentials.json                # Firebase credentials (if backend)
-└── src/push/                       # Backend helpers (if backend detected)
-    ├── pushHelper.{ts|js}
-    └── routes/ or module/          # Framework-specific
+├── our_pkg.json                    # Centralized Configuration
+├── credentials.json                # Firebase Service Account
+└── src/helper/                     # Backend FCM Engine
+    └── FCMHelper.{ts|js}           # Premium, documented helper
 ```
+
+### Date-Based Conflict Resolution
+When a file collision occurs (e.g., `FCMHelper.js` already exists), the CLI offers a non-destructive fallback:
+- **Rename with Date**: Appends the current date to the filename (e.g., `FCMHelper-27-03.js`).
+- **Benefits**: Preserves project history without polluting the CLI with complex diffing logic when not needed.
 
 ### Package-based Frontend
 ```
 your-project/
-├── node_modules/custom-push/       # Package files
-├── public/firebase-messaging-sw.js # Generated on-demand
+├── node_modules/custom-push/       # Runtime logic
+├── public/firebase-messaging-sw.js # Service worker
 └── src/
-    └── App.tsx                     # User imports from package
+    └── App.tsx                     # Zero-boilerplate integration
 ```
 
 ### Generated Frontend (Optional)
@@ -145,7 +149,7 @@ your-project/
         └── pushHelper.{ts|js}      # Generated helper
 ```
 
-## 🔧 Technical Implementation
+## Technical Implementation
 
 ### CLI Changes
 1. **Command Structure**: Added commander.js for CLI parsing
@@ -166,7 +170,7 @@ your-project/
 3. **Service worker** generated on-demand with user's config
 4. **Backend integration** via generated endpoints
 
-## 🎯 Use Cases
+##  Use Cases
 
 ### 1. **Backend Developers**
 ```bash
@@ -196,7 +200,7 @@ npx custom-push generate-service-worker
 # Already have custom frontend implementation
 ```
 
-## 🔄 Migration Path
+##  Migration Path
 
 ### From Old to New Architecture
 1. **Existing projects**: Continue working with generated files
@@ -208,21 +212,21 @@ npx custom-push generate-service-worker
 - Generated files remain functional
 - Gradual migration possible
 
-## 🚀 Future Enhancements
+## Future Enhancements
 
 ### Package Features
-- 🎨 Custom notification UI components
-- 📊 Analytics and tracking
-- 🔄 Advanced scheduling
-- 🌐 Multi-language support
+- Custom notification UI components
+- Analytics and tracking
+- Advanced scheduling
+- Multi-language support
 
 ### CLI Features
-- 🔍 Enhanced project detection
-- 📦 Package management integration
-- 🎯 Template customization
-- 🔌 Plugin system
+- Enhanced project detection
+-  Package management integration
+-  Template customization
+- Plugin system
 
-## 📊 Decision Matrix
+## Decision Matrix
 
 | Scenario | Recommended Approach |
 |----------|---------------------|

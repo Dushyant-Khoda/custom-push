@@ -60,7 +60,7 @@ function NotificationBell() {
 
   return (
     <div>
-      <span>🔔 {messages.length} new</span>
+      <span>{messages.length} new</span>
       <div>
         {messages.map(msg => (
           <div key={msg.id}>

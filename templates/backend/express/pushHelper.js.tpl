@@ -5,7 +5,7 @@
  * This helper provides a robust interface for sending push notifications 
  * using the Firebase Admin SDK.
  * 
- * 🚀 QUICK START (Test with static data):
+ * QUICK START (Test with static data):
  * 
  * const { sendPushNotification } = require('./FCMHelper'); // or pushHelper
  * 
@@ -48,7 +48,7 @@ if (!admin.apps.length) {
  * @param {string} [params.icon='/icon.png'] - Custom icon path (Relative to public/ or absolute URL)
  * @param {Object} [params.data={}] - Additional custom key-value pairs
  * 
- * 💡 BEST PRACTICES:
+ * BEST PRACTICES:
  * - Icons: Recommended size is 192x192px (PNG).
  * - Payload: Keep 'data' keys small to avoid truncation (4KB limit).
  * - VAPID: Ensure your VAPID key is correctly configured in Firebase for Safari support.

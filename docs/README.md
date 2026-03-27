@@ -2,7 +2,7 @@
 
 A production-grade CLI tool that sets up Firebase Cloud Messaging push notifications in any React project with a single command.
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # Initialize push notifications in your React project
@@ -13,22 +13,22 @@ npm install -g custom-push
 custom-push init
 ```
 
-## ✨ Features
+## Features
 
-- 🔍 **Auto-detection** - Automatically detects your project stack, framework, and backend
-- 📝 **Minimal prompts** - Asks only 4 questions maximum, everything else is detected
-- ⚡ **Version validation** - Validates Firebase and React compatibility
-- 🔄 **Conflict resolution** - Interactive UI to handle existing files
-- 🎯 **Backend support** - Scaffolds for both Express and NestJS
-- 📦 **Production ready** - Generates complete, working code with no TODOs
+- **Auto-detection** - Automatically detects your project stack, framework, and backend
+- **Minimal prompts** - Asks only 4 questions maximum, everything else is detected
+- **Version validation** - Validates Firebase and React compatibility
+-  **Conflict resolution** - Interactive UI to handle existing files
+-  **Backend support** - Scaffolds for both Express and NestJS
+-  **Production ready** - Generates complete, working code with no TODOs
 
-## 📋 Requirements
+## Requirements
 
 - Node.js >= 18.0.0
 - React project (Create React App, Next.js, Vite, etc.)
 - Firebase project (for configuration)
 
-## 🛠️ What It Does
+## What It Does
 
 The CLI analyzes your project and sets up:
 
@@ -47,7 +47,7 @@ The CLI analyzes your project and sets up:
 - Token registration endpoints
 - Credentials handling
 
-## 📁 Project Structure After Setup
+## Project Structure After Setup
 
 ```
 your-project/
@@ -60,7 +60,7 @@ your-project/
 └── credentials.json                ← Firebase credentials (if backend)
 ```
 
-## 🔧 Usage
+## Usage
 
 ### 1. Run the CLI
 ```bash
@@ -100,7 +100,7 @@ import { PushModule } from './push/push.module'
 @Module({ imports: [PushModule] })
 ```
 
-## ⚙️ Configuration
+## Configuration
 
 All configuration is stored in `our_pkg.json`:
 
@@ -125,7 +125,7 @@ All configuration is stored in `our_pkg.json`:
 }
 ```
 
-## 🔍 What Gets Detected
+## What Gets Detected
 
 - **Language**: TypeScript vs JavaScript (from tsconfig.json)
 - **Framework**: React presence and version
@@ -134,7 +134,7 @@ All configuration is stored in `our_pkg.json`:
 - **Structure**: src/ vs root-level files
 - **Directories**: Creates public/ if missing
 
-## 🚨 Version Compatibility
+## Version Compatibility
 
 - **Firebase**: >=10.0.0 and <13.0.0
 - **React**: >=17.0.0
@@ -142,7 +142,7 @@ All configuration is stored in `our_pkg.json`:
 
 The CLI will warn you about version mismatches and ask for confirmation before proceeding.
 
-## 🔄 Conflict Resolution
+##  Conflict Resolution
 
 If files already exist, the CLI provides options:
 - **Overwrite** - Replace existing file
@@ -150,7 +150,7 @@ If files already exist, the CLI provides options:
 - **View** - Show current file content
 - **Diff** - Show what would change
 
-## 📱 Sending Push Notifications
+## Sending Push Notifications
 
 ### From Backend
 
@@ -176,7 +176,7 @@ await sendPushNotification({
 3. Target your web app
 4. Send notification
 
-## 🛠️ Development
+## Development
 
 ### Build
 ```bash
@@ -194,7 +194,7 @@ npm link
 custom-push init
 ```
 
-## 📚 Advanced Usage
+## Advanced Usage
 
 ### Custom Firebase Config
 You can update Firebase config anytime by editing `our_pkg.json`:
@@ -231,7 +231,7 @@ Update backend URLs in `our_pkg.json`:
 }
 ```
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -257,15 +257,15 @@ Set environment variable for debug output:
 DEBUG=custom-push:* npx custom-push init
 ```
 
-## 📄 License
+## License
 
 MIT License - see LICENSE file for details.
 
-## 🤝 Contributing
+## Contributing
 
 See CONTRIBUTING.md for guidelines.
 
-## 📞 Support
+## Support
 
 - Create an issue on GitHub
 - Check the troubleshooting section

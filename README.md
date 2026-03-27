@@ -8,70 +8,85 @@
 
 A production-grade CLI tool that scaffolds Firebase Cloud Messaging backend infrastructure with flexible frontend integration options. Focus on backend development while the frontend is handled by the `custom-push` package.
 
-## ✨ Features
+## Features
 
-- 🔍 **Backend-focused** - Scaffolds Express/NestJS helpers and routes
-- 📦 **Package-based Frontend** - Frontend logic handled by `custom-push` npm package
-- 🎯 **Flexible Options** - Backend-only, package-based, or full boilerplate generation
-- 🔄 **Service Worker Generator** - On-demand service worker generation
-- 📝 **Minimal Prompts** - Backend-focused configuration by default
-- ⚡ **Version Validation** - Validates Firebase and React compatibility
-- 🛡️ **Production Ready** - Generates complete, working backend code
+- **Backend-focused** - Scaffolds Express/NestJS helpers and routes
+-  **Package-based Frontend** - Frontend logic handled by `custom-push` npm package
+-  **Flexible Options** - Backend-only, package-based, or full boilerplate generation
+-  **Service Worker Generator** - On-demand service worker generation
+- **Minimal Prompts** - Backend-focused configuration by default
+- **Version Validation** - Validates Firebase and React compatibility
+- **Production Ready** - Generates complete, working backend code
 
-## 🚀 Quick Start
+## Quick Start
 
-### Default (Backend + Package Instructions)
-```bash
-npx custom-push init
-# Backend scaffolding + frontend package instructions
-```
-
-### Backend Only
+### Professional Backend-Only Setup
+Zero frontend fluff. Just the server-side engine.
 ```bash
 npx custom-push init --backend-only
-# Skip frontend completely, backend scaffolding only
 ```
 
-### Full Setup (Backend + Frontend Boilerplate)
+### Full Setup (Backend + Package Instructions)
+The standard flow for both frontend and backend integration.
+```bash
+npx custom-push init
+```
+
+### Maximum Control (Backend + Frontend Boilerplate)
+Full source-code generation for complete customization.
 ```bash
 npx custom-push init --generate-frontend
-# Generate both backend and frontend boilerplate
 ```
 
-### Service Worker Only
-```bash
-npx custom-push generate-service-worker
-# Generate only the service worker file
-```
-
-## � Frontend Package Integration
+##  Frontend Package Integration
 
 ### 1. Install the package
 ```bash
 npm install custom-push
 ```
 
-### 2. Configure in your app
+### 2. Wrap your App with CustomPushProvider
 ```typescript
-import { usePush } from 'custom-push'
+import { CustomPushProvider } from 'custom-push';
 
-function App() {
-  usePush({
-    firebase: {
-      apiKey: "your-api-key",
-      authDomain: "your-project.firebaseapp.com",
-      projectId: "your-project-id",
-      storageBucket: "your-project.appspot.com",
-      messagingSenderId: "123456789",
-      appId: "1:123456789:web:abcdef"
-    },
-    vapidKey: "your-vapid-key"
-  })
-  return <YourApp />
+const pushConfig = {
+  apiKey: "your-api-key",
+  authDomain: "your-project.firebaseapp.com",
+  projectId: "your-project-id",
+  storageBucket: "your-project.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abcdef",
+  vapidKey: "your-vapid-key"
+};
+
+function Root() {
+  return (
+    <CustomPushProvider config={pushConfig}>
+      <App />
+    </CustomPushProvider>
+  );
 }
 ```
 
-## 🎯 What It Does
+### 3. Use the hook in your components
+```typescript
+import { usePushMessage } from 'custom-push';
+
+function App() {
+  const { requestPermission, token, messages } = usePushMessage();
+
+  return (
+    <div>
+      <button onClick={() => requestPermission()}>
+        Enable Notifications
+      </button>
+      {token && <p>Push Token ready!</p>}
+    </div>
+  );
+}
+```
+
+##  What It Does
 
 ### Backend (Default)
 - ✅ Express/NestJS helpers and routes
@@ -92,7 +107,7 @@ function App() {
 - ✅ Push notification helper (`src/push/pushHelper.{ts|js}`)
 - ✅ TypeScript interfaces
 
-## 📁 Project Structure After Setup
+## Project Structure After Setup
 
 ### Default (Backend + Package)
 ```
@@ -116,14 +131,14 @@ your-project/
 └── credentials.json                # Firebase credentials (if backend)
 ```
 
-## 🔍 What Gets Detected
+## What Gets Detected
 
 - **Backend Framework**: Express vs NestJS (NestJS takes priority)
 - **Project Structure**: src/ vs root-level files
 - **Firebase Version**: From dependencies for compatibility
 - **Node.js Version**: Validates minimum requirements
 
-## ⚙️ Configuration
+## Configuration
 
 All configuration is stored in `our_pkg.json`:
 
@@ -148,19 +163,20 @@ All configuration is stored in `our_pkg.json`:
 }
 ```
 
-## 📱 Sending Push Notifications
+## Sending Push Notifications
 
-### From Backend (Generated)
+### From Backend (Generated FCMHelper)
 ```typescript
-import { sendPushNotification } from './push/pushHelper'
+import { sendPushNotification } from './helper/FCMHelper';
 
+// Static-data test or dynamic payload
 await sendPushNotification({
   token: 'user-device-token',
-  title: 'Hello World',
-  body: 'This is a push notification!',
-  data: { customKey: 'customValue' },
-  route: '/notifications'
-})
+  title: 'Elite Alert',
+  body: 'This is a premium notification from CustomPush!',
+  route: '/dashboard',
+  icon: '/custom-icon.png' // Recommended 192x192px
+});
 ```
 
 ### From Firebase Console
@@ -169,7 +185,7 @@ await sendPushNotification({
 3. Target your web app
 4. Send notification
 
-## 🛠️ Requirements
+## Requirements
 
 - **Node.js**: >= 18.0.0
 - **Backend**: Express or NestJS (optional)
@@ -178,13 +194,13 @@ await sendPushNotification({
 ## � Documentation
 
 - 📖 **[Architecture Guide](./docs/ARCHITECTURE.md)** - New architecture overview
-- 🔧 **[Installation Guide](./docs/INSTALLATION.md)** - Detailed setup instructions
+- **[Installation Guide](./docs/INSTALLATION.md)** - Detailed setup instructions
 - 📡 **[API Reference](./docs/API.md)** - Complete API documentation
-- 🐛 **[Troubleshooting](./docs/TROUBLESHOOTING.md)** - Common issues and solutions
+- **[Troubleshooting](./docs/TROUBLESHOOTING.md)** - Common issues and solutions
 - � **[Examples](./docs/EXAMPLES.md)** - Code examples and patterns
 - ❓ **[FAQ](./docs/FAQ.md)** - Frequently asked questions
 
-## 🚨 Version Compatibility
+## Version Compatibility
 
 - **Firebase**: >=10.0.0 and <13.0.0
 - **Node**: >=18.0.0
@@ -209,7 +225,7 @@ npm link
 custom-push --help
 ```
 
-## 🎯 Use Cases
+##  Use Cases
 
 | Scenario | Command | Description |
 |----------|---------|-------------|
@@ -218,15 +234,15 @@ custom-push --help
 | **Maximum Control** | `npx custom-push init --generate-frontend` | Generate all boilerplate |
 | **Service Worker Only** | `npx custom-push generate-service-worker` | Just need service worker |
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please read our [Contributing Guide](./CONTRIBUTING.md) for details.
 
-## 📄 License
+## License
 
 MIT © [Your Name](./LICENSE)
 
-## 🔗 Links
+## Links
 
 - [GitHub Repository](https://github.com/your-username/custom-push)
 - [NPM Package](https://www.npmjs.com/package/custom-push)
@@ -237,7 +253,7 @@ MIT © [Your Name](./LICENSE)
 
 **Made with ❤️ for the React community**
 
-## 📋 What It Does
+## What It Does
 
 The CLI analyzes your project and sets up everything needed for push notifications:
 
@@ -259,7 +275,7 @@ The CLI analyzes your project and sets up everything needed for push notificatio
 - ✅ Token registration endpoints
 - ✅ Credentials handling with .gitignore
 
-## 🎯 Usage
+##  Usage
 
 ### 1. Run the CLI
 ```bash
@@ -299,7 +315,7 @@ import { PushModule } from './push/push.module'
 @Module({ imports: [PushModule] })
 ```
 
-## 📁 Project Structure After Setup
+## Project Structure After Setup
 
 ```
 your-project/
@@ -312,7 +328,7 @@ your-project/
 └── credentials.json                ← Firebase credentials (if backend)
 ```
 
-## 🔍 What Gets Detected
+## What Gets Detected
 
 - **Language**: TypeScript vs JavaScript (from tsconfig.json)
 - **Framework**: React presence and version
@@ -321,7 +337,7 @@ your-project/
 - **Structure**: src/ vs root-level files
 - **Directories**: Creates public/ if missing
 
-## ⚙️ Configuration
+## Configuration
 
 All configuration is stored in `our_pkg.json`:
 ## `our_pkg.json`

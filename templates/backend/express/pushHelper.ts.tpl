@@ -5,7 +5,7 @@
  * This helper provides a robust interface for sending push notifications 
  * using the Firebase Admin SDK.
  * 
- * 🚀 QUICK START (Test with static data):
+ * QUICK START (Test with static data):
  * 
  * import { sendPushNotification } from './FCMHelper'; // or pushHelper
  * 
@@ -55,7 +55,7 @@ export interface PushNotificationParams {
 /**
  * Sends a push notification to a specific device.
  * 
- * 💡 BEST PRACTICES:
+ * BEST PRACTICES:
  * - Icons: Recommended size is 192x192px (PNG).
  * - Payload: Keep 'data' keys small to avoid truncation (4KB limit).
  * - VAPID: Ensure your VAPID key is correctly configured in Firebase for Safari support.

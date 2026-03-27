@@ -1,14 +1,15 @@
 # Examples and Use Cases
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Basic Setup](#basic-setup)
 - [React Integration](#react-integration)
+- [Frontend Package Integration](#frontend-package-integration)
 - [Backend Integration](#backend-integration)
 - [Advanced Patterns](#advanced-patterns)
 - [Real-world Scenarios](#real-world-scenarios)
 
-## 🚀 Basic Setup
+## Basic Setup
 
 ### Minimal React App
 ```typescript
@@ -65,7 +66,7 @@ function App() {
 export default App
 ```
 
-## ⚛️ React Integration
+## React Integration
 
 ### withToast Notifications
 ```typescript
@@ -193,7 +194,126 @@ function App() {
 }
 ```
 
-## 🔧 Backend Integration
+##  Frontend Package Integration (Recommended)
+
+### 1. Root Provider Setup
+Wrap your entire application with the `<CustomPushProvider>` to enable the push notification engine.
+
+```typescript
+// index.tsx / App.tsx
+import { CustomPushProvider } from 'custom-push';
+
+const pushConfig = {
+  apiKey: "your-api-key",
+  authDomain: "your-project.firebaseapp.com",
+  projectId: "your-project-id",
+  storageBucket: "your-project.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abcdef",
+  vapidKey: "your-vapid-key",
+  registerUrl: "https://your-api.com/push/register"
+};
+
+function Root() {
+  return (
+    <CustomPushProvider config={pushConfig}>
+      <App />
+    </CustomPushProvider>
+  );
+}
+```
+
+### 2. Requesting Permission & Getting Token
+Use the `usePushMessage` hook to trigger the permission prompt and access the FCM token.
+
+```typescript
+import { usePushMessage } from 'custom-push';
+
+export function SetupPush() {
+  const { requestPermission, token, isSupported, isPermissionGranted } = usePushMessage();
+
+  const handleEnable = async () => {
+    // IMPORTANT: Must be called from a button click for Safari support
+    const granted = await requestPermission();
+    if (granted) {
+      console.log('Push notifications enabled!');
+    }
+  };
+
+  if (!isSupported) return <p>Browser not supported</p>;
+
+  return (
+    <div>
+      {isPermissionGranted ? (
+        <p>Token: {token?.slice(0, 10)}...</p>
+      ) : (
+        <button onClick={handleEnable}>Enable Notifications</button>
+      )}
+    </div>
+  );
+}
+```
+
+### 3. Handling Foreground Messages
+You can access the `messages` array for current-session notifications or use the `onToast` prop in the provider.
+
+```typescript
+// Component within the provider
+const { messages, clearMessages } = usePushMessage();
+
+return (
+  <ul>
+    {messages.map(msg => (
+      <li key={msg.id}>
+        <strong>{msg.title}</strong>: {msg.body}
+      </li>
+    ))}
+  </ul>
+);
+```
+
+## Premium Backend FCM Engine
+
+### Standard FCMHelper Usage (Recommended)
+The CLI generates a production-grade helper in `src/helper/FCMHelper.ts` (or `.js`).
+
+```typescript
+import { sendPushNotification } from './helper/FCMHelper';
+
+// Example 1: Basic alert
+async function notifyUser(token: string) {
+  await sendPushNotification({
+    token,
+    title: 'Order Shipped! ',
+    body: 'Your package is on its way and will arrive tomorrow.',
+    icon: '/icons/shipping-192x192.png'
+  });
+}
+
+// Example 2: Interactive notification with dynamic route
+async function notifyInvite(token: string, inviteId: string) {
+  await sendPushNotification({
+    token,
+    title: 'New Team Invite',
+    body: 'Alex invited you to join "Project X"',
+    route: `/invites/${inviteId}`, // Service worker will navigate here on click
+    data: { inviteId, type: 'TEAM_INVITE' },
+    icon: '/icons/invite-192x192.png'
+  });
+}
+
+// Example 3: Silent data update (No popup, just data)
+async function syncData(token: string, syncId: string) {
+  await sendPushNotification({
+    token,
+    title: '', // Empty title/body makes it a data-only message
+    body: '',
+    data: { syncId, action: 'REFRESH_CACHE' }
+  });
+}
+```
+
+## Backend Integration
 
 ### Express with Authentication
 ```typescript
@@ -375,7 +495,7 @@ export class PushService implements OnModuleInit {
 }
 ```
 
-## 🎨 Advanced Patterns
+## Advanced Patterns
 
 ### Custom Notification Handler
 ```typescript
@@ -538,7 +658,7 @@ export class NotificationScheduler {
 }
 ```
 
-## 🌍 Real-world Scenarios
+## Real-world Scenarios
 
 ### Chat Application
 ```typescript
@@ -593,7 +713,7 @@ export function useEcommerceNotifications() {
 
       switch (type) {
         case 'flash_sale':
-          new Notification('⚡ Flash Sale!', {
+          new Notification('Flash Sale!', {
             body: `${payload.notification?.body}`,
             icon: '/sale-icon.png',
             data: { route: `/product/${productId}` }
@@ -601,7 +721,7 @@ export function useEcommerceNotifications() {
           break
 
         case 'price_drop':
-          new Notification('💰 Price Drop!', {
+          new Notification('Price Drop!', {
             body: `${payload.notification?.body}`,
             icon: '/price-drop.png',
             data: { route: `/product/${productId}` }
@@ -609,7 +729,7 @@ export function useEcommerceNotifications() {
           break
 
         case 'back_in_stock':
-          new Notification('🎉 Back in Stock!', {
+          new Notification('Back in Stock!', {
             body: `${payload.notification?.body}`,
             icon: '/stock-icon.png',
             data: { route: `/product/${productId}` }
@@ -650,7 +770,7 @@ export function useSocialNotifications(currentUserId: string) {
 
       switch (type) {
         case 'like':
-          new Notification('❤️ New Like', {
+          new Notification('New Like', {
             body: `${payload.notification?.body}`,
             icon: '/like.png',
             data: { route: `/post/${postId}` }
@@ -658,7 +778,7 @@ export function useSocialNotifications(currentUserId: string) {
           break
 
         case 'comment':
-          new Notification('💬 New Comment', {
+          new Notification('New Comment', {
             body: `${payload.notification?.body}`,
             icon: '/comment.png',
             data: { route: `/post/${postId}` }
@@ -666,7 +786,7 @@ export function useSocialNotifications(currentUserId: string) {
           break
 
         case 'follow':
-          new Notification('👤 New Follower', {
+          new Notification('New Follower', {
             body: `${payload.notification?.body}`,
             icon: '/follow.png',
             data: { route: `/profile/${actorId}` }
@@ -674,7 +794,7 @@ export function useSocialNotifications(currentUserId: string) {
           break
 
         case 'mention':
-          new Notification('🏷️ You were mentioned', {
+          new Notification('You were mentioned', {
             body: `${payload.notification?.body}`,
             icon: '/mention.png',
             data: { route: `/post/${postId}` }
@@ -701,7 +821,7 @@ export function useTaskNotifications() {
 
       switch (type) {
         case 'task_assigned':
-          new Notification('📋 New Task Assigned', {
+          new Notification('New Task Assigned', {
             body: `${payload.notification?.body}`,
             icon: '/task.png',
             data: { route: `/task/${taskId}` }
@@ -725,7 +845,7 @@ export function useTaskNotifications() {
           break
 
         case 'deadline_reminder':
-          new Notification('⏰ Deadline Approaching', {
+          new Notification('Deadline Approaching', {
             body: `${payload.notification?.body}`,
             icon: '/deadline.png',
             data: { route: `/task/${taskId}` }
@@ -733,7 +853,7 @@ export function useTaskNotifications() {
           break
 
         case 'task_overdue':
-          new Notification('🚨 Task Overdue', {
+          new Notification('Task Overdue', {
             body: `${payload.notification?.body}`,
             icon: '/overdue.png',
             data: { route: `/task/${taskId}` }
@@ -745,7 +865,7 @@ export function useTaskNotifications() {
 }
 ```
 
-## 📱 Progressive Web App Integration
+## Progressive Web App Integration
 
 ```typescript
 // service-worker-registration.ts
@@ -791,7 +911,7 @@ function App() {
 }
 ```
 
-## 🔧 Testing Examples
+## Testing Examples
 
 ### Mock Push Notifications for Testing
 ```typescript
