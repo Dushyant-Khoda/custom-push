@@ -129,14 +129,15 @@ export async function runPrompts(project: ProjectInfo, options: { backendOnly?: 
     credentialsPath: null,
   }
 
+  const envPrefix = project.isVite ? 'VITE' : 'REACT_APP'
+
   // ── Environment Variables — Only for frontend-enabled setups ────────
   if (apiKey && !backendOnly) {
-    const envPrefix = project.isVite ? 'VITE' : 'REACT_APP'
 
     logger.blank()
-    logger.divider()
-    logger.info('  Add these to your .env file:')
-    logger.divider()
+    logger.raw('──────────────────────────────────────────────')
+    logger.raw('  Add these to your .env file')
+    logger.raw('──────────────────────────────────────────────')
     logger.blank()
     logger.raw(`  ${envPrefix}_FIREBASE_API_KEY=${firebase.apiKey}`)
     logger.raw(`  ${envPrefix}_FIREBASE_AUTH_DOMAIN=${firebase.authDomain}`)
@@ -146,8 +147,10 @@ export async function runPrompts(project: ProjectInfo, options: { backendOnly?: 
     logger.raw(`  ${envPrefix}_FIREBASE_APP_ID=${firebase.appId}`)
     logger.raw(`  ${envPrefix}_FIREBASE_VAPID_KEY=${firebase.vapidKey}`)
     logger.blank()
-    logger.warn('  ⚠  Never commit .env to git. Add it to .gitignore.')
-    logger.divider()
+    logger.warn('  ⚠  Never commit .env to git. Add it to .gitignore now.')
+    logger.raw('──────────────────────────────────────────────')
+    
+    await input({ message: 'Press Enter once you\'ve added these values...' })
     logger.blank()
 
     const saveEnv = await confirm({
@@ -203,12 +206,25 @@ export async function runPrompts(project: ProjectInfo, options: { backendOnly?: 
   // ── Usage guide ───────────────────────────────────────────────────────
   if (!backendOnly) {
     logger.blank()
-    logger.divider()
-    logger.info('  How to use custom-push in your app:')
-    logger.divider()
+    logger.raw('──────────────────────────────────────────────')
+    logger.raw('  How to use custom-push in your app')
+    logger.raw('──────────────────────────────────────────────')
     logger.blank()
-    logger.raw('  // 1. Wrap your app root:')
+    logger.raw('  // 1. In src/push/NotificationHandler/config.ts (already generated):')
+    logger.raw('  export const pushConfig = {')
+    logger.raw(`    apiKey: process.env.${envPrefix}_FIREBASE_API_KEY!,`)
+    logger.raw(`    authDomain: process.env.${envPrefix}_FIREBASE_AUTH_DOMAIN!,`)
+    logger.raw(`    projectId: process.env.${envPrefix}_FIREBASE_PROJECT_ID!,`)
+    logger.raw(`    storageBucket: process.env.${envPrefix}_FIREBASE_STORAGE_BUCKET!,`)
+    logger.raw(`    messagingSenderId: process.env.${envPrefix}_FIREBASE_MESSAGING_SENDER_ID!,`)
+    logger.raw(`    appId: process.env.${envPrefix}_FIREBASE_APP_ID!,`)
+    logger.raw(`    vapidKey: process.env.${envPrefix}_FIREBASE_VAPID_KEY!,`)
+    logger.raw("    registerUrl: '/api/push/register',")
+    logger.raw('  }')
+    logger.blank()
+    logger.raw('  // 2. Wrap your app root (src/App.tsx or src/main.tsx):')
     logger.raw("  import { CustomPushProvider } from 'custom-push'")
+    logger.raw("  import { pushConfig } from './push/NotificationHandler/config'")
     logger.blank()
     logger.raw('  function App() {')
     logger.raw('    return (')
@@ -218,12 +234,26 @@ export async function runPrompts(project: ProjectInfo, options: { backendOnly?: 
     logger.raw('    )')
     logger.raw('  }')
     logger.blank()
-    logger.raw('  // 2. Use in any component:')
+    logger.raw('  // 3. Use in any component:')
     logger.raw("  import { usePushMessage } from 'custom-push'")
-    logger.raw('  const { requestPermission, messages } = usePushMessage()')
     logger.blank()
-    logger.warn('  ⚠  Safari: requestPermission() must be called from a button click.')
-    logger.divider()
+    logger.raw('  function NotificationButton() {')
+    logger.raw('    const { messages, sendMessage, requestPermission } = usePushMessage()')
+    logger.raw('    return (')
+    logger.raw('      <div>')
+    logger.raw("        <button onClick={requestPermission}>Enable Notifications</button>")
+    logger.raw("        <button onClick={() => sendMessage('Hello', 'World')}>Send Test</button>")
+    logger.raw('        {messages.map(m => <div key={m.id}>{m.title}: {m.body}</div>)}')
+    logger.raw('      </div>')
+    logger.raw('    )')
+    logger.raw('  }')
+    logger.blank()
+    logger.raw('  // 4. Get the raw token anywhere:')
+    logger.raw("  import { getPushToken } from 'custom-push'")
+    logger.raw('  const token = await getPushToken(pushConfig)')
+    logger.raw("  console.log('FCM Token:', token)")
+    logger.raw('──────────────────────────────────────────────')
+    logger.blank()
   }
 
   return {

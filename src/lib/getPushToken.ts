@@ -2,113 +2,23 @@ import { initializeApp, getApps, FirebaseApp } from 'firebase/app'
 import { getMessaging, getToken } from 'firebase/messaging'
 import { PushConfig } from './types'
 
-/**
- * Get a Firebase Cloud Messaging push notification token.
- *
- * Handles service worker registration for all browsers including Safari.
- * Returns null on any error (errors are logged with actionable context).
- */
 export async function getPushToken(config: PushConfig): Promise<string | null> {
-  // Guard: must be in a browser
-  if (typeof window === 'undefined') {
-    console.warn('[custom-push] getPushToken called in a non-browser environment. Skipping.')
-    return null
-  }
-
-  if (!('serviceWorker' in navigator)) {
-    console.warn('[custom-push] Service Workers are not supported in this browser. Cannot get push token.')
-    return null
-  }
-
-  if (!('Notification' in window)) {
-    console.warn('[custom-push] Notification API is not available. Cannot get push token.')
-    return null
-  }
-
-  if (Notification.permission !== 'granted') {
-    console.warn(
-      '[custom-push] Notification permission is not granted. ' +
-      'Call requestPermission() first before getPushToken().'
-    )
-    return null
-  }
-
-  const swPath = config.serviceWorkerPath || '/firebase-messaging-sw.js'
+  if (typeof window === 'undefined') return null
+  if (!('serviceWorker' in navigator)) return null
 
   try {
-    const app: FirebaseApp = getApps().length ? getApps()[0] : initializeApp(config)
+    const app: FirebaseApp = getApps().length
+      ? getApps()[0]
+      : initializeApp(config)
+
     const messaging = getMessaging(app)
-
-    // Register or reuse service worker
-    // Use '/' scope so SW controls all pages — not just the SW file path
-    let registration: ServiceWorkerRegistration
-
-    try {
-      // First try to find an existing registration for our SW file
-      const registrations = await navigator.serviceWorker.getRegistrations()
-      const existing = registrations.find(r => {
-        const sw = r.active || r.waiting || r.installing
-        return sw?.scriptURL.includes(swPath.replace(/^\//, ''))
-      })
-
-      if (existing) {
-        registration = existing
-      } else {
-        registration = await navigator.serviceWorker.register(swPath, { scope: '/' })
-        console.info(`[custom-push] Service worker registered: ${swPath}`)
-      }
-    } catch (swErr: any) {
-      console.error(
-        '[custom-push] Service worker registration failed:',
-        swErr.message,
-        `\n  → Ensure ${swPath} exists in your /public directory`,
-        '\n  → Ensure it is served with the correct MIME type (application/javascript)',
-        '\n  → For Next.js: use next-pwa or place the SW in the /public directory'
-      )
-      return null
-    }
-
-    // Wait for the service worker to be fully active
-    await navigator.serviceWorker.ready
-
+    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js')
     const token = await getToken(messaging, {
       vapidKey: config.vapidKey,
       serviceWorkerRegistration: registration,
     })
-
-    if (!token) {
-      console.warn(
-        '[custom-push] Firebase returned an empty token. Possible causes:',
-        '\n  → VAPID key may be incorrect or missing',
-        '\n  → Service worker may not be in an active state',
-        '\n  → Firebase project may not have Web Push enabled'
-      )
-      return null
-    }
-
-    return token
-  } catch (error: any) {
-    const ua = navigator.userAgent
-    const isSafari = /^((?!chrome|android|crios|fxios|edgios|opr|firefox).)*safari/i.test(ua)
-
-    if (isSafari) {
-      console.error(
-        '[custom-push] Safari push token error:',
-        error.message,
-        '\n  → requestPermission() must be called directly from a user gesture (button click)',
-        '\n  → VAPID key must be set in your Firebase project (Cloud Messaging settings)',
-        '\n  → Safari 16+ is required for Web Push support',
-        '\n  → Ensure the service worker file is accessible at:', swPath
-      )
-    } else {
-      console.error(
-        '[custom-push] Failed to get push token:',
-        error.message,
-        '\n  → Check your Firebase config values (apiKey, appId, messagingSenderId)',
-        '\n  → Check that VAPID key is correct'
-      )
-    }
-
+    return token ?? null
+  } catch {
     return null
   }
 }

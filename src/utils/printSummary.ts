@@ -100,19 +100,16 @@ export async function printSummary(context: CLIContext): Promise<void> {
     logger.raw(`      npm install custom-push`)
     logger.blank()
 
-    logger.raw(`  [2] Wrap your app root:`)
+    logger.raw(`  [2] Wrap your app root (src/App.tsx or src/main.tsx):`)
     logger.raw(`      import { CustomPushProvider } from 'custom-push'`)
-    logger.raw(`      import { pushConfig } from './push/notificationHandler/pushConfig'`)
-    logger.raw(`      import { PushNotificationManager } from './push/notificationHandler/PushNotificationManager'`)
+    logger.raw(`      import { pushConfig } from './push/NotificationHandler/config'`)
     logger.blank()
     logger.raw(`      <CustomPushProvider config={pushConfig}>`)
-    logger.raw(`        <PushNotificationManager />`)
-    logger.raw(`        <App />`)
+    logger.raw(`        <YourApp />`)
     logger.raw(`      </CustomPushProvider>`)
     logger.blank()
-
     logger.raw(`  [3] Add a permission toggle button:`)
-    logger.raw(`      Check the USAGE.md in src/push/notificationHandler/`)
+    logger.raw(`      Check the USAGE.md in src/push/NotificationHandler/`)
     logger.blank()
   }
 

@@ -56,21 +56,22 @@ export async function scaffoldFrontend(context: CLIContext): Promise<ScaffoldedF
   const ext = project.language === 'typescript' ? 'ts' : 'js'
   const helperTemplatePath = path.join(TEMPLATES_DIR, helperTemplate)
   const helperContent = await readFile(helperTemplatePath)
-  const helperPath = path.join(project.srcDir, 'push', `pushHelper.${ext}`)
 
   // ── Ensure directories exist ──────────────────────────────────────────
   const pushDir = path.join(project.srcDir, 'push')
-  const handlerDir = path.join(pushDir, 'notificationHandler')
+  const handlerDir = path.join(pushDir, 'NotificationHandler')
   await ensureDir(pushDir)
   await ensureDir(handlerDir)
+
+  const helperPath = path.join(handlerDir, `pushHelper.${ext}`)
 
   // ── 3. Zero-Config Handler Files ──────────────────────────────────────
   const managerTemplate = await readFile(path.join(TEMPLATES_DIR, FRONTEND_MANAGER_TPL))
   const configTemplate = await readFile(path.join(TEMPLATES_DIR, FRONTEND_CONFIG_TPL))
   const usageTemplate = await readFile(path.join(TEMPLATES_DIR, FRONTEND_USAGE_TPL))
 
-  const managerPath = path.join(handlerDir, `PushNotificationManager.${project.language === 'typescript' ? 'tsx' : 'js'}`)
-  const configPath = path.join(handlerDir, `pushConfig.${ext}`)
+    const managerPath = path.join(handlerDir, `PushNotificationManager.${project.language === 'typescript' ? 'tsx' : 'js'}`)
+  const configPath = path.join(handlerDir, `config.${ext}`)
   const usagePath = path.join(handlerDir, 'USAGE.md')
 
   // ── Run conflict checks ───────────────────────────────────────────────
@@ -83,7 +84,7 @@ export async function scaffoldFrontend(context: CLIContext): Promise<ScaffoldedF
     {
       path: helperPath,
       content: helperContent,
-      description: 'Frontend helper — import usePush() anywhere in your app',
+      description: 'Frontend helper — initializes and handles tokens',
     },
     {
       path: managerPath,
@@ -93,12 +94,12 @@ export async function scaffoldFrontend(context: CLIContext): Promise<ScaffoldedF
     {
       path: configPath,
       content: configTemplate,
-      description: 'Auto-syncing configuration file',
+      description: 'Firebase configuration file',
     },
     {
       path: usagePath,
       content: usageTemplate,
-      description: 'Quick usage guide for your notificationHandler',
+      description: 'Quick usage guide for your NotificationHandler',
     },
   ]
 
