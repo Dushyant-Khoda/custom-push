@@ -2,13 +2,18 @@ import * as semver from 'semver'
 import { ProjectInfo, VersionWarning } from '../types'
 import { FIREBASE_VERSION_RANGE, REACT_VERSION_RANGE } from '../constants'
 
-export function validateVersions(project: ProjectInfo): VersionWarning[] {
+export function validateVersions(project: ProjectInfo, options: { backendOnly?: boolean } = {}): VersionWarning[] {
+  const { backendOnly = false } = options
   const warnings: VersionWarning[] = []
+
+  // Skip all frontend-related checks if backend-only
+  if (backendOnly) {
+    return warnings
+  }
 
   // ── Firebase check ─────────────────────────────────────────────────────
   if (!project.firebaseVersion) {
-    // For backend-only mode, the client firebase SDK may not be installed —
-    // that's expected. Only warn if we expect a frontend.
+    // Only warn if we expect a frontend
     if (project.scope === 'frontend' || project.scope === 'both') {
       warnings.push({
         package: 'firebase',
@@ -30,7 +35,6 @@ export function validateVersions(project: ProjectInfo): VersionWarning[] {
   }
 
   // ── React check — only when project actually uses React ────────────────
-  // Pure backend projects don't need React, so don't warn about it.
   const hasFrontend = project.scope === 'frontend' || project.scope === 'both'
   if (hasFrontend) {
     if (!project.reactVersion) {

@@ -57,13 +57,20 @@ export async function runPrompts(project: ProjectInfo, options: { backendOnly?: 
 
     const credInput = await input({
       message: 'Path to your Firebase credentials.json (service account file):',
+      default: './credentials.json',
     })
     credentialsPath = credInput.trim() || null
 
-    // 2. Optional Web Config (for service config if needed)
+    // 2. URLs
+    logger.blank()
+    logger.info('Backend endpoints for token management:')
+    registerUrl = await optionalInput('Token registration URL (e.g. http://localhost:3000/push/register):')
+    unregisterUrl = await optionalInput('Token unregister URL (optional — press Enter to skip):')
+
+    // 3. Optional Web Config (usually not needed for backend-only unless they want to sync configs)
     logger.blank()
     const wantWebConfig = await confirm({
-      message: 'Also provide Firebase Web Config? (Usually not needed for backend-only)',
+      message: 'Also provide Firebase Web Config? (NOT required for basic backend setup)',
       default: false,
     })
 
@@ -87,12 +94,6 @@ export async function runPrompts(project: ProjectInfo, options: { backendOnly?: 
       logger.blank()
       vapidKey = await requiredInput('Enter your VAPID key:')
     }
-
-    // 3. URLs
-    logger.blank()
-    logger.info('Backend endpoints for token management:')
-    registerUrl = await optionalInput('Token registration URL (e.g. http://localhost:3000/push/register):')
-    unregisterUrl = await optionalInput('Token unregister URL (optional — press Enter to skip):')
 
   } else {
     // ── Mode: Standard (Frontend + Optional Backend) ─────────────────────
@@ -134,6 +135,7 @@ export async function runPrompts(project: ProjectInfo, options: { backendOnly?: 
       logger.info('  Press Enter to skip and add it manually to our_pkg.json later.')
       const credInput = await input({
         message: 'Path to your Firebase credentials.json:',
+        default: './credentials.json',
       })
       credentialsPath = credInput.trim() || null
     }
@@ -155,8 +157,8 @@ export async function runPrompts(project: ProjectInfo, options: { backendOnly?: 
     credentialsPath: null,
   }
 
-  // ── Environment Variables ───────────────────────────────────────────
-  if (apiKey) {
+  // ── Environment Variables — Only for frontend-enabled setups ────────
+  if (apiKey && !backendOnly) {
     const envPrefix = project.isVite ? 'VITE' : 'REACT_APP'
 
     logger.blank()

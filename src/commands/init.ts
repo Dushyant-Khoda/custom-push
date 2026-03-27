@@ -34,17 +34,24 @@ export async function init(options: {
   detectSpin.succeed('Project detected successfully')
 
   logger.info(`   Language: ${project.language}`)
-  logger.info(`   React: ${project.reactVersion ? `✓ v${project.reactVersion}` : '✗ not found'}`)
+  if (!backendOnly) {
+    logger.info(`   React: ${project.reactVersion ? `✓ v${project.reactVersion}` : '✗ not found'}`)
+  }
   logger.info(`   Firebase: ${project.hasFirebase ? `✓ v${project.firebaseVersion}` : '✗ not found'}`)
-  logger.info(`   Framework: ${project.isNextJs ? 'Next.js' : project.isVite ? 'Vite' : 'React'}`)
+  
+  if (!backendOnly) {
+    const framework = project.isNextJs ? 'Next.js' : project.isVite ? 'Vite' : (project.reactVersion ? 'React' : 'none')
+    logger.info(`   Framework: ${framework}`)
+  }
+
   logger.info(`   Backend: ${project.backendFramework || 'none'}`)
-  logger.info(`   Mode: ${mode}`)
+  logger.info(`   Mode: ${backendOnly ? 'backend-only' : mode}`)
 
   // ── Step 2: Validate versions ───────────────────────────────────────────
   showStep(2, 'Validating dependencies...')
   const validateSpin = createSpinner('Checking version compatibility...', 'pulse')
   validateSpin.start()
-  const warnings = validateVersions(project)
+  const warnings = validateVersions(project, { backendOnly })
   validateSpin.succeed('Version validation complete')
 
   if (warnings.length > 0) {
@@ -83,6 +90,7 @@ export async function init(options: {
     warnings,
     mode,
     serviceWorkerFilename: SERVICE_WORKER_FILENAME,
+    backendOnly,
   }
 
   // ── Step 4: Process credentials ───────────────────────────────────────
@@ -103,7 +111,7 @@ export async function init(options: {
   configSpin.succeed('Configuration file created')
 
   // ── Step 6: Scaffold based on mode ────────────────────────────────────
-  if (mode === 'files') {
+  if (mode === 'files' && !backendOnly) {
     // --files mode: generate standalone files into src/push-notification/
     showStep(6, 'Generating standalone push notification files...')
     const filesSpin = createSpinner('Scaffolding push-notification files...', 'rocket')

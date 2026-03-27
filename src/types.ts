@@ -71,4 +71,5 @@ export interface CLIContext {
   warnings: VersionWarning[]
   mode: InitMode
   serviceWorkerFilename: string         // actual filename used (may differ if collision)
+  backendOnly: boolean                  // whether user explicitly chose backend-only setup
 }
