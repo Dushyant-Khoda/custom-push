@@ -67,34 +67,6 @@ export async function runPrompts(project: ProjectInfo, options: { backendOnly?: 
     registerUrl = await optionalInput('Token registration URL (e.g. http://localhost:3000/push/register):')
     unregisterUrl = await optionalInput('Token unregister URL (optional — press Enter to skip):')
 
-    // 3. Optional Web Config (usually not needed for backend-only unless they want to sync configs)
-    logger.blank()
-    const wantWebConfig = await confirm({
-      message: 'Also provide Firebase Web Config? (NOT required for basic backend setup)',
-      default: false,
-    })
-
-    if (wantWebConfig) {
-      logger.blank()
-      logger.info('Get your config from:')
-      logger.info('Firebase Console → Project Settings → Your apps → SDK setup and configuration')
-      logger.blank()
-
-      apiKey = await requiredInput('API Key:')
-      authDomain = await requiredInput('Auth Domain:')
-      projectId = await requiredInput('Project ID:')
-      storageBucket = await requiredInput('Storage Bucket:')
-      messagingSenderId = await requiredInput('Messaging Sender ID:')
-      appId = await requiredInput('App ID:')
-
-      logger.blank()
-      logger.info('VAPID Key (Web Push certificate):')
-      logger.info(`  Get it from: ${FIREBASE_MESSAGING_URL}`)
-      logger.info(`  Or generate one: ${VAPID_GENERATOR_URL}`)
-      logger.blank()
-      vapidKey = await requiredInput('Enter your VAPID key:')
-    }
-
   } else {
     // ── Mode: Standard (Frontend + Optional Backend) ─────────────────────
     logger.blank()

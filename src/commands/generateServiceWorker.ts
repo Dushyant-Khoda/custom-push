@@ -19,12 +19,6 @@ interface OurPackageJson {
 }
 
 export async function generateServiceWorker(): Promise<void> {
-  logger.blank()
-  logger.divider()
-  logger.info('  Service Worker Generator')
-  logger.divider()
-  logger.blank()
-
   const cwd = process.cwd()
   let firebaseConfig: ServiceWorkerConfig
 

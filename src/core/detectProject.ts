@@ -3,7 +3,8 @@ import { ProjectInfo, Language, BackendFramework, Scope } from '../types'
 import { logger } from '../utils/logger'
 import { fileExists, readJson, ensureDir } from '../utils/fileUtils'
 
-export async function detectProject(cwd: string): Promise<ProjectInfo> {
+export async function detectProject(cwd: string, options: { backendOnly?: boolean } = {}): Promise<ProjectInfo> {
+  const { backendOnly = false } = options
   const rootDir = cwd
 
   // ── package.json ──────────────────────────────────────────────────────
@@ -54,12 +55,15 @@ export async function detectProject(cwd: string): Promise<ProjectInfo> {
   const srcDir = (await fileExists(srcCandidate)) ? srcCandidate : rootDir
 
   // ── publicDir ─────────────────────────────────────────────────────────
-  const publicCandidate = path.join(rootDir, 'public')
-  if (!(await fileExists(publicCandidate))) {
-    await ensureDir(publicCandidate)
-    logger.info('ℹ  No /public directory found. Created it.')
+  const publicDir = path.join(rootDir, 'public')
+  
+  // Only create public directory and warn if not in backend-only mode
+  if (!backendOnly) {
+    if (!(await fileExists(publicDir))) {
+      await ensureDir(publicDir)
+      logger.info('ℹ  No /public directory found. Created it.')
+    }
   }
-  const publicDir = publicCandidate
 
   return {
     rootDir,

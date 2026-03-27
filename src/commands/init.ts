@@ -23,14 +23,11 @@ export async function init(options: {
   const { files = false, generateFrontend = false, backendOnly = false } = options
   const mode: InitMode = files ? 'files' : 'library'
 
-  // Show welcome message
-  logger.raw(messages.welcome)
-
   // ── Step 1: Detect project ────────────────────────────────────────────
   showStep(1, 'Analyzing project structure...')
   const detectSpin = createSpinner('Detecting project configuration...', 'dots')
   detectSpin.start()
-  const project = await detectProject(cwd)
+  const project = await detectProject(cwd, { backendOnly })
   detectSpin.succeed('Project detected successfully')
 
   logger.info(`   Language: ${project.language}`)
